@@ -1,0 +1,18 @@
+{
+	"type": "OBJECT", 
+	"nameToSchema": {
+		"id": {
+			"type": "STRING", 
+			"nameToSchema": { }
+		}, 
+		"student": {
+			"type": "OBJECT", 
+			"nameToSchema": {
+				"age": {
+					"type": "NUMBER", 
+					"nameToSchema": { }
+				}
+			}
+		}
+	}
+}

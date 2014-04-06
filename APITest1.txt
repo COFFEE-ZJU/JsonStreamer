@@ -1,0 +1,298 @@
+[ 
+{ 
+    "type": "root", 
+    "input": { 
+        "type": "istream", 
+        "input": { 
+            "type": "projection", 
+            "projection": { 
+                "type": "projection_obj", 
+                "projection_type": "object", 
+                "fields": [ 
+                    { 
+                        "type": "projection_obj", 
+                        "need_rename": false, 
+                        "projection_type": "direct", 
+                        "expression": { 
+                            "type": "expression_obj", 
+                            "expression_type": "id", 
+                            "id_name": [ 
+                                "name"
+                            ]
+                        }
+                    }, 
+                    { 
+                        "type": "projection_obj", 
+                        "need_rename": false, 
+                        "projection_type": "direct", 
+                        "expression": { 
+                            "type": "expression_obj", 
+                            "expression_type": "id", 
+                            "id_name": [ 
+                                "salary"
+                            ]
+                        }
+                    }, 
+                    { 
+                        "type": "projection_obj", 
+                        "need_rename": true, 
+                        "rename": "annualDiffFromAvg", 
+                        "projection_type": "direct", 
+                        "expression": { 
+                            "type": "expression_obj", 
+                            "expression_type": "sub", 
+                            "left": { 
+                                "type": "expression_obj", 
+                                "expression_type": "mul", 
+                                "left": { 
+                                    "type": "expression_obj", 
+                                    "expression_type": "id", 
+                                    "id_name": [ 
+                                        "salary"
+                                    ]
+                                }, 
+                                "right": { 
+                                    "type": "expression_obj", 
+                                    "expression_type": "int", 
+                                    "int_value": 12
+                                }
+                            }, 
+                            "right": { 
+                                "type": "expression_obj", 
+                                "expression_type": "mul", 
+                                "left": { 
+                                    "type": "expression_obj", 
+                                    "expression_type": "id", 
+                                    "id_name": [ 
+                                        "avgInDept"
+                                    ]
+                                }, 
+                                "right": { 
+                                    "type": "expression_obj", 
+                                    "expression_type": "int", 
+                                    "int_value": 12
+                                }
+                            }
+                        }
+                    }, 
+                    { 
+                        "type": "projection_obj", 
+                        "need_rename": true, 
+                        "rename": "foo", 
+                        "projection_type": "direct", 
+                        "expression": { 
+                            "type": "expression_obj", 
+                            "expression_type": "id", 
+                            "id_name": [ 
+                                "tags", 
+                                1, 
+                                2
+                            ]
+                        }
+                    }
+                ]
+            }, 
+            "input": { 
+                "type": "join", 
+                "left_join_attribute": [ 
+                    "department"
+                ], 
+                "right_join_attribute": [ 
+                    "dept"
+                ], 
+                "left_outer": false, 
+                "right_outer": false, 
+                "projection": { 
+                    "type": "projection_obj", 
+                    "projection_type": "object", 
+                    "fields": [ 
+                        { 
+                            "type": "projection_obj", 
+                            "need_rename": false, 
+                            "projection_type": "direct", 
+                            "expression": { 
+                                "type": "expression_obj", 
+                                "expression_type": "id", 
+                                "id_name": [ 
+                                    "name"
+                                ], 
+                                "attribute_source": "right"
+                            }
+                        }, 
+                        { 
+                            "type": "projection_obj", 
+                            "need_rename": false, 
+                            "projection_type": "direct", 
+                            "expression": { 
+                                "type": "expression_obj", 
+                                "expression_type": "id", 
+                                "id_name": [ 
+                                    "salary"
+                                ], 
+                                "attribute_source": "right"
+                            }
+                        }, 
+                        { 
+                            "type": "projection_obj", 
+                            "need_rename": true, 
+                            "rename": "avgInDept", 
+                            "projection_type": "direct", 
+                            "expression": { 
+                                "type": "expression_obj", 
+                                "expression_type": "id", 
+                                "id_name": [ 
+                                    "avgSalary"
+                                ], 
+                                "attribute_source": "left"
+                            }
+                        }, 
+                        { 
+                            "type": "projection_obj", 
+                            "need_rename": false, 
+                            "projection_type": "direct", 
+                            "expression": { 
+                                "type": "expression_obj", 
+                                "expression_type": "id", 
+                                "id_name": [ 
+                                    "another_object", 
+                                    "tags"
+                                ], 
+                                "attribute_source": "right"
+                            }
+                        }
+                    ]
+                }, 
+                "left_input": { 
+                    "type": "groupby_aggregation", 
+                    "groupby_attribute_name": [ 
+                        "dept"
+                    ], 
+                    "projection": { 
+                        "type": "projection_obj", 
+                        "projection_type": "object", 
+                        "fields": [ 
+                            { 
+                                "type": "projection_obj", 
+                                "need_rename": true, 
+                                "rename": "department", 
+                                "projection_type": "direct", 
+                                "expression": { 
+                                    "type": "expression_obj", 
+                                    "expression_type": "id", 
+                                    "id_name": [ ], 
+                                    "attribute_source": "group_key_var"
+                                }
+                            }, 
+                            { 
+                                "type": "projection_obj", 
+                                "need_rename": true, 
+                                "rename": "empCnt", 
+                                "projection_type": "direct", 
+                                "expression": { 
+                                    "type": "expression_obj", 
+                                    "expression_type": "aggregation", 
+                                    "aggregate_projection": { 
+                                        "type": "projection_obj", 
+                                        "projection_type": "direct", 
+                                        "expression": { 
+                                            "type": "expression_obj", 
+                                            "expression_type": "id", 
+                                            "id_name": [ ], 
+                                            "attribute_source": "group_array"
+                                        }
+                                    }
+                                }
+                            }, 
+                            { 
+                                "type": "projection_obj", 
+                                "need_rename": true, 
+                                "rename": "avgSalary", 
+                                "projection_type": "direct", 
+                                "expression": { 
+                                    "type": "expression_obj", 
+                                    "expression_type": "aggregation", 
+                                    "aggregate_operation": "average", 
+                                    "aggregate_projection": { 
+                                        "type": "projection_obj", 
+                                        "projection_type": "direct", 
+                                        "expression": { 
+                                            "type": "expression_obj", 
+                                            "expression_type": "id", 
+                                            "id_name": [ 
+                                                -1, 
+                                                "salary"
+                                            ], 
+                                            "attribute_source": "group_array"
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }, 
+                    "input": { 
+                        "type": "rangewindow", 
+                        "windowsize": "now", 
+                        "input": { 
+                            "type": "leaf", 
+                            "stream_source": "testSchema", 
+                            "is_master": true
+                        }
+                    }
+                }, 
+                "right_input": { 
+                    "type": "selection", 
+                    "selection_condition": { 
+                        "type": "condition_obj", 
+                        "condition_type": "or", 
+                        "left_condition": { 
+                            "type": "condition_obj", 
+                            "condition_type": "ge", 
+                            "left_expression": { 
+                                "type": "expression_obj", 
+                                "expression_type": "mul", 
+                                "left": { 
+                                    "type": "expression_obj", 
+                                    "expression_type": "id", 
+                                    "id_name": [ 
+                                        "salary"
+                                    ]
+                                }, 
+                                "right": { 
+                                    "type": "expression_obj", 
+                                    "expression_type": "int", 
+                                    "int_value": 12
+                                }
+                            }, 
+                            "right_expression": { 
+                                "type": "expression_obj", 
+                                "expression_type": "int", 
+                                "int_value": 1000000
+                            }
+                        }, 
+                        "right_condition": { 
+                            "type": "condition_obj", 
+                            "condition_type": "bool", 
+                            "bool_expression": { 
+                                "type": "expression_obj", 
+                                "expression_type": "id", 
+                                "id_name": [ 
+                                    "is_manager"
+                                ]
+                            }
+                        }
+                    }, 
+                    "input": { 
+                        "type": "rangewindow", 
+                        "windowsize": "3 hours", 
+                        "input": { 
+                            "type": "leaf", 
+                            "stream_source": "testSchema", 
+                            "is_master": true
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+]

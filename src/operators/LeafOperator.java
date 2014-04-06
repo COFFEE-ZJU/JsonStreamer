@@ -1,14 +1,18 @@
 package operators;
 
 import json.Element;
+import jsonAPI.JsonQueryTree;
+import IO.IOManager;
 import IO.JStreamInput;
 
 public class LeafOperator extends Operator{
 	private boolean isMaster = false;
 	private JStreamInput inputStream;
 	
-	public LeafOperator(JStreamInput stream, boolean isMasterStream){
-		setInputStream(stream, isMasterStream);
+	public LeafOperator(JsonQueryTree tree){
+		super(tree);
+		JStreamInput inputStream = IOManager.getInstance().getInputStreamByName(tree.stream_source);
+		setInputStream(inputStream, tree.is_master);
 	}
 	
 	@Override
