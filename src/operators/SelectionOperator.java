@@ -1,27 +1,14 @@
 package operators;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.google.gson.JsonElement;
-import com.google.gson.annotations.Expose;
-import com.sun.xml.internal.ws.server.sei.SEIInvokerTube;
-
-import constants.Constants;
-import constants.Constants.AggrFuncNames;
-import constants.Constants.CondType;
-import constants.Constants.ExprType;
-import constants.Constants.JsonAttrSource;
+import query.ConditionDealer;
 
 import json.Element;
 import jsonAPI.JsonCondition;
-import jsonAPI.JsonExpression;
-import jsonAPI.JsonProjection;
 import jsonAPI.JsonQueryTree;
 
 public class SelectionOperator extends Operator{
 	private final JsonCondition condition;
+	private final ConditionDealer dealer;
 	
 //	private static final Map<String, CondType> stringToCondType = new HashMap<String, CondType>(){{
 //		put("and", CondType.AND);
@@ -122,97 +109,13 @@ public class SelectionOperator extends Operator{
 	
 	
 	private boolean satisfyCondition(Element ele, JsonCondition cond){
-		JsonElement left,right;
-		switch (condition.getType()) {
-		case AND:
-			return satisfyCondition(ele, cond.left_condition)&&satisfyCondition(ele, cond.right_condition);
-		case OR:
-			return satisfyCondition(ele, cond.left_condition)||satisfyCondition(ele, cond.right_condition);
-		case NOT:
-			return ! satisfyCondition(ele, cond.condition);
-		case BOOL:
-			return ele.getValue(cond.bool_expression).getAsBoolean();
-		case EQ:
-			left = ele.getValue(cond.left_expression);
-			right = ele.getValue(cond.right_expression);
-			switch (cond.left_expression.retSchema.type) {
-			case BOOLEAN:
-				return left.getAsBoolean() == right.getAsBoolean();
-			case INTEGER:
-			case NUMBER:
-				return left.getAsDouble() == right.getAsDouble();
-			case NULL:
-				return left.isJsonNull() == left.isJsonNull();
-			case STRING:
-				return left.getAsString().equals(right.getAsString());
-			case ARRAY: //TODO
-			case OBJECT: //TODO
-
-			default:
-				return false;
-			}
-		case NE:
-			left = ele.getValue(cond.left_expression);
-			right = ele.getValue(cond.right_expression);
-			switch (cond.left_expression.retSchema.type) {
-			case BOOLEAN:
-				return left.getAsBoolean() != right.getAsBoolean();
-			case INTEGER:
-			case NUMBER:
-				return left.getAsDouble() != right.getAsDouble();
-			case NULL:
-				return left.isJsonNull() != left.isJsonNull();
-			case STRING:
-				return ! left.getAsString().equals(right.getAsString());
-			case ARRAY: //TODO
-			case OBJECT: //TODO
-
-			default:
-				return false;
-			}
-		case LT:
-			left = ele.getValue(cond.right_expression);		//the opposite way, reduce code redundancy
-			right = ele.getValue(cond.left_expression);
-		case GT:
-			left = ele.getValue(cond.left_expression);
-			right = ele.getValue(cond.right_expression);
-			switch (cond.left_expression.retSchema.type) {
-			case INTEGER:
-			case NUMBER:
-				return left.getAsDouble() > right.getAsDouble();
-			case STRING:
-				return left.getAsString().compareTo(right.getAsString()) > 0;
-
-			default:
-				return false;
-			}
-			
-		case LE:
-			left = ele.getValue(cond.right_expression);		//the opposite way, reduce code redundancy
-			right = ele.getValue(cond.left_expression);
-		case GE:
-			left = ele.getValue(cond.left_expression);
-			right = ele.getValue(cond.right_expression);
-			switch (cond.left_expression.retSchema.type) {
-			case INTEGER:
-			case NUMBER:
-				return left.getAsDouble() >= right.getAsDouble();
-			case STRING:
-				return left.getAsString().compareTo(right.getAsString()) >= 0;
-
-			default:
-				return false;
-			}
-
-		default:
-			break;
-		}
-		return false;
+		return dealer.deal(ele);
 	}
 	
 	public SelectionOperator(JsonQueryTree tree){
 		super(tree);
 		this.condition = tree.selection_condition;
+		dealer = ConditionDealer.genConditionDealer(condition);
 	}
 	@Override
 	public void execute() {

@@ -163,7 +163,7 @@ public class JsonSchema {
 	}
 	
 	public boolean validate(Element ele){
-		return validate(ele.element, this);
+		return validate(ele.jsonElement, this);
 	}
 	
 	private boolean validate(JsonElement ele, JsonSchema schema){

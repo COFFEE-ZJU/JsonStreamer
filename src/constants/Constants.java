@@ -6,10 +6,11 @@ import java.util.Map;
 import com.google.gson.Gson;
 
 public class Constants {
-	public enum OperatorState {READY, SUSPEND};
+	public static enum OperatorState {READY, SUSPEND};
 	
-	public enum CondType {GT, GE, EQ, LE, LT, NOT, NE, BOOL, AND, OR};
-	public enum ExprType {ID, INT, NUMBER, BOOL, NULL, STRING, ADD, SUB, DIV, MUL, MOD, AGGREGATION};
+	public static enum ElementMark {PLUS, MINUS};
+	public static enum JsonExprType {ID, INT, NUMBER, BOOL, NULL, STRING, ADD, SUB, DIV, MUL, MOD, AGGREGATION};
+	public static enum JsonCondType {AND, OR, NOT, GT, GE, LT, LE, EQ, NE, BOOL};
 	
 	public static Gson gson = new Gson();
 	public static String schemaFilePath = "schemas/";
@@ -20,21 +21,6 @@ public class Constants {
 		public static final String MINUTES = "minutes";
 		public static final String HOURS = "hours";
 		public static final String DAYS = "days";
-	}
-	
-	public static class JsonExprType {
-		public static final String ID = "id";
-		public static final String INT = "int";
-		public static final String NUMBER = "number";
-		public static final String BOOL = "bool";
-		public static final String NULL = "null";
-		public static final String STRING = "string";
-		public static final String ADD = "add";
-		public static final String SUB = "sub";
-		public static final String DIV = "div";
-		public static final String MUL = "mul";
-		public static final String MOD = "mod";
-		public static final String AGGREGATION = "aggregation";
 	}
 	
 	public static class JsonConditionType {	//and, or, not, gt, ge, lt, le, eq, ne, bool

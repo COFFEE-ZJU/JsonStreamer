@@ -1,6 +1,7 @@
 package jsonAPI;
 
 import java.util.List;
+import java.util.Map;
 
 import json.JsonSchema;
 
@@ -12,10 +13,10 @@ import constants.Constants.JsonProjectionType;
 
 public class JsonProjection {
 	@Expose public String type = "projection_obj";
-	@Expose public Boolean need_rename = null;
-	@Expose public String rename = null;
+//	public Boolean need_rename = null;
+//	public String rename = null;
 	@Expose public JsonProjectionType projection_type = null;
-	@Expose public List<JsonProjection> fields = null;		//for object type
+	@Expose public Map<String, JsonProjection> fields = null;		//for object type
 	@Expose public List<JsonProjection> array_items = null;		//for array type
 	@Expose public JsonExpression expression = null;		//for primitive type
 	

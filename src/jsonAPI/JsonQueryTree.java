@@ -9,8 +9,8 @@ public class JsonQueryTree {
 	@Expose public JsonOpType type = null;
 	
 	@Expose public JsonCondition selection_condition = null;
-	@Expose public List<Object> left_join_attribute = null;
-	@Expose public List<Object> right_join_attribute = null;
+	@Expose public JsonExpression left_join_attribute = null;
+	@Expose public JsonExpression right_join_attribute = null;
 	@Expose public Boolean left_outer = null;
 	@Expose public Boolean right_outer = null;
 	@Expose public Object windowsize = null;

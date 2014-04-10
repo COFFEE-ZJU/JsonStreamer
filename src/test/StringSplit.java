@@ -5,7 +5,7 @@ public class StringSplit {
 		String[] s = "an d time".split(" ");
 		System.out.println(s.length);
 		
-		System.out.println("id, int, number, bool, null, string, add, sub, div, mul, mod, aggregation".toUpperCase());
+		System.out.println("and, or, not, gt, ge, lt, le, eq, ne, bool".toUpperCase());
 		
 		System.out.println("abf".compareTo("abde"));
 	}

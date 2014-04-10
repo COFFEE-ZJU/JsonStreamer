@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
@@ -37,7 +38,7 @@ public class GsonTest {
 	}
 	public enum Type {TA, TB};
 	
-	public GsonTest(){
+	public void test1(){
 		Gson gs = new Gson();
 		int[] ints = new int[]{1,2,3};
 		
@@ -70,8 +71,15 @@ public class GsonTest {
 		System.out.println(o5.getClass());
 	}
 	
+	@SuppressWarnings("deprecation")
+	public void test2(){
+		Gson gs = new Gson();
+		JsonElement ele = new JsonNull();
+		System.out.println(ele.isJsonNull());
+	}
+	
 	public static void main(String[] args) {
 		
-		new GsonTest();
+		new GsonTest().test2();
 	}
 }
