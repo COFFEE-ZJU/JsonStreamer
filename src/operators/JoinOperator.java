@@ -9,22 +9,26 @@ import java.util.Map;
 import java.util.Set;
 
 import query.JoinEqDealer;
+import query.ProjectionDealer;
 
 import json.Element;
+import json.ElementIdGenerator;
 import jsonAPI.JsonQueryTree;
 
 public class JoinOperator extends Operator{
 	private static enum Source {LEFT, RIGHT};
 	
 	private final boolean leftOutter, rightOutter;
-	private final Map<Long, Set<Long> > leftMapper, rightMapper;
+	private final Map<Long, Set<Long> > leftRelatedMapper, rightRelatedMapper;	
+	//map to those elements which are related to the input element
 	private final Map<Long, Element> leftElements, rightElements;
 	private final Map<Long, Element> synopsis;
 	private final JoinEqDealer eqDealer;
+	private final ProjectionDealer projDealer;
 	public JoinOperator(JsonQueryTree tree) {
 		super(tree);
-		leftMapper = new HashMap<Long, Set<Long> >();
-		rightMapper = new HashMap<Long, Set<Long> >();
+		leftRelatedMapper = new HashMap<Long, Set<Long> >();
+		rightRelatedMapper = new HashMap<Long, Set<Long> >();
 		synopsis = new HashMap<Long, Element>();
 		leftElements = new HashMap<Long, Element>();
 		rightElements = new HashMap<Long, Element>();
@@ -32,6 +36,7 @@ public class JoinOperator extends Operator{
 		leftOutter = rightOutter = false; 	//TODO
 		
 		eqDealer = new JoinEqDealer(tree.left_join_attribute, tree.right_join_attribute);
+		projDealer = ProjectionDealer.genProjectionDealer(tree.projection);
 	}
 	
 	private void processPlus(long id, Element ele, Source source){
@@ -40,12 +45,12 @@ public class JoinOperator extends Operator{
 		Iterator<Element> it;
 		if(source == Source.LEFT){
 			leftElements.put(id, ele);
-			mapper = leftMapper;
+			mapper = leftRelatedMapper;
 			otherSideElements = rightElements.values();
 		}
 		else{
 			rightElements.put(id, ele);
-			mapper = rightMapper;
+			mapper = rightRelatedMapper;
 			otherSideElements = leftElements.values();
 		}
 		
@@ -58,7 +63,18 @@ public class JoinOperator extends Operator{
 			if(source == Source.LEFT) test = eqDealer.deal(ele, currentEle);
 			else test = eqDealer.deal(currentEle, ele);
 			
-			if(test) ;//project and add this
+			if(test){
+				Element newEle;
+				long newId;
+				if(source == Source.LEFT) newEle = projDealer.deal(ele, currentEle);
+				else newEle = projDealer.deal(currentEle, ele);
+				
+				newId = ElementIdGenerator.getNewId();
+				synopsis.put(newId, newEle);
+				set.add(newId);
+				
+				//TODO output the plus marked element
+			}
 			
 		}
 		
@@ -69,11 +85,11 @@ public class JoinOperator extends Operator{
 		Map<Long, Set<Long> > mapper;
 		if(source == Source.LEFT){
 			leftElements.remove(id);
-			mapper = leftMapper;
+			mapper = leftRelatedMapper;
 		}
 		else{
 			rightElements.remove(id);
-			mapper = rightMapper;
+			mapper = rightRelatedMapper;
 		}
 		
 		if(! mapper.containsKey(id)) return ;		//no elements related to this one

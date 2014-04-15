@@ -2,6 +2,8 @@ package test;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -78,8 +80,50 @@ public class GsonTest {
 		System.out.println(ele.isJsonNull());
 	}
 	
+	class Eq1{
+		int id;
+		String str;
+		public Eq1(int id, String str){
+			this.id = id;
+			this.str = str;
+		}
+	}
+	class Eq2{
+		String str;
+		int id;
+		public Eq2(int id, String str){
+			this.id = id;
+			this.str = str;
+		}
+	}
+	
+	public void test3(){
+		
+		Gson gs = new Gson();
+		Eq1 eq1 = new Eq1(2, "test");
+		Eq2 eq2 = new Eq2(2, "test");
+//		String gstring1 = gs.toJson(1.00);
+//		String gstring2 = gs.toJson(1);
+		String gstring1 = gs.toJson(eq1);
+		String gstring2 = gs.toJson(eq2);
+		System.out.println(gstring1);
+		System.out.println(gstring2);
+		Map<JsonElement, Integer> mapper = new HashMap<JsonElement, Integer>();
+		
+		JsonElement ele1,ele2;
+		ele1 = gs.fromJson(gstring1, JsonElement.class);
+		ele2 = gs.fromJson(gstring2, JsonElement.class);
+		
+		mapper.put(ele1, 1);
+		mapper.put(ele2, 2);
+		System.out.println(mapper.get(ele1));
+		ele1.getAsJsonObject().add("new", new JsonPrimitive(111));
+		System.out.println(ele1.equals(ele2));
+		System.out.println(ele1.hashCode() + ",  " + ele2.hashCode());
+	}
+	
 	public static void main(String[] args) {
 		
-		new GsonTest().test2();
+		new GsonTest().test3();
 	}
 }

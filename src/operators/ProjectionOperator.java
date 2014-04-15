@@ -1,22 +1,40 @@
 package operators;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import query.ProjectionDealer;
 
 import json.Element;
+import json.ElementIdGenerator;
 import jsonAPI.JsonProjection;
 import jsonAPI.JsonQueryTree;
 
 public class ProjectionOperator extends Operator{
-	private final JsonProjection projection;
-	private final ProjectionDealer dealer;
+	private final ProjectionDealer projDealer;
+	private final Map<Long, Element> synopsis;
+	private final Map<Long, Long> relatedMap;
 	public ProjectionOperator(JsonQueryTree tree) {
 		super(tree);
-		projection = tree.projection;
-		dealer = ProjectionDealer.genProjectionDealer(projection);
+		projDealer = ProjectionDealer.genProjectionDealer(tree.projection);
+		synopsis = new HashMap<Long, Element>();
+		relatedMap = new HashMap<Long, Long>();
 	}
 	
-	private Element project(Element ele){
-		return dealer.deal(ele);
+	private void processPlus(long id, Element ele){
+		Element newEle = projDealer.deal(ele);
+		long newId = ElementIdGenerator.getNewId();
+		synopsis.put(newId, newEle);
+		//TODO put plus mark and output this element
+		relatedMap.put(id, newId);
+	}
+	
+	private void processMinus(long id){
+		long eleIdToDelete = relatedMap.get(id);
+		Element eleToDelete = synopsis.get(eleIdToDelete);
+		//TODO put minus mark and output this element
+		relatedMap.remove(id);
+		synopsis.remove(eleIdToDelete);
 	}
 
 //	private JsonElement project(JsonElement ele, JsonProjection proj){

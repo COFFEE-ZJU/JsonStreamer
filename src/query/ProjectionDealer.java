@@ -19,7 +19,10 @@ public abstract class ProjectionDealer {
 		projection = proj;
 	}
 	
-	public abstract Element deal(Element ele);
+	public Element deal(Element ele){
+		return deal(ele, null);
+	}
+	public abstract Element deal(Element ele, Element rightEle);
 	
 	public static ProjectionDealer genProjectionDealer(JsonProjection proj){
 		switch (proj.projection_type) {
@@ -48,8 +51,8 @@ class DirectDealer extends ProjectionDealer{
 	}
 
 	@Override
-	public Element deal(Element ele) {
-		return exprDealer.deal(ele);
+	public Element deal(Element ele, Element rightEle) {
+		return exprDealer.deal(ele, rightEle);
 	}
 }
 
@@ -67,13 +70,13 @@ class ObjectDealer extends ProjectionDealer{
 	}
 
 	@Override
-	public Element deal(Element ele) {
+	public Element deal(Element ele, Element rightEle) {
 		JsonObject obj = new JsonObject();
 		Iterator<Entry<String, ProjectionDealer> > it = map.entrySet().iterator();
 		Entry<String, ProjectionDealer> ent;
 		while(it.hasNext()){
 			ent = it.next();
-			obj.add(ent.getKey(), ent.getValue().deal(ele).jsonElement);
+			obj.add(ent.getKey(), ent.getValue().deal(ele, rightEle).jsonElement);
 		}
 		return new Element(obj, projection.retSchema.type);
 	}
@@ -89,10 +92,10 @@ class ArrayDealer extends ProjectionDealer{
 	}
 
 	@Override
-	public Element deal(Element ele) {
+	public Element deal(Element ele, Element rightEle) {
 		JsonArray array = new JsonArray();
 		Iterator<ProjectionDealer> it = list.iterator();
-		while(it.hasNext()) array.add(it.next().deal(ele).jsonElement);
+		while(it.hasNext()) array.add(it.next().deal(ele, rightEle).jsonElement);
 		return new Element(array, projection.retSchema.type);
 	}
 	

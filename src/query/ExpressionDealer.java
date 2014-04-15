@@ -9,6 +9,7 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
 import constants.Constants.AggrFuncNames;
+import constants.Constants.JsonAttrSource;
 import constants.Constants.JsonValueType;
 
 import json.Element;
@@ -20,7 +21,11 @@ public abstract class ExpressionDealer {
 	protected ExpressionDealer(JsonExpression expr){
 		expression = expr;
 	}
-	public abstract Element deal(Element ele);
+	
+	public Element deal(Element ele){
+		return deal(ele, null);
+	}
+	public abstract Element deal(Element ele, Element rightEle);
 	
 	public static ExpressionDealer genExpressionDealer(JsonExpression expr){
 		switch (expr.expression_type) {
@@ -52,7 +57,7 @@ class PrimitiveDealer extends ExpressionDealer{
 	}
 	@SuppressWarnings("deprecation")
 	@Override
-	public Element deal(Element ele) {
+	public Element deal(Element ele, Element rightEle) {
 		switch (expression.expression_type) {
 		case INT:
 			return new Element(new JsonPrimitive(expression.int_value), JsonValueType.INTEGER);
@@ -73,13 +78,24 @@ class PrimitiveDealer extends ExpressionDealer{
 }
 
 class IdDealer extends ExpressionDealer{
+	private final Boolean isLeftOrGroupArray;
 	protected IdDealer(JsonExpression expr) {
 		super(expr);
+		if(expr.attribute_source == null) isLeftOrGroupArray = null;
+		else if(expr.attribute_source == JsonAttrSource.left || expr.attribute_source == JsonAttrSource.group_array)
+			isLeftOrGroupArray = true;
+		else isLeftOrGroupArray = false;
 	}
 
 	@Override
-	public Element deal(Element ele) {
-		return new Element(getIdValue(expression.id_name.toArray(), 0, ele.jsonElement), expression.retSchema.type);
+	public Element deal(Element ele, Element rightEle) {
+		if(isLeftOrGroupArray == null || rightEle == null)		//not in join or groupby
+			return new Element(getIdValue(expression.id_name.toArray(), 0, ele.jsonElement), expression.retSchema.type);
+		
+		if(isLeftOrGroupArray == false)		//use left source in join or group array in groupby
+			return new Element(getIdValue(expression.id_name.toArray(), 0, rightEle.jsonElement), expression.retSchema.type);
+		else								//use right source in join or group key var in groupby
+			return new Element(getIdValue(expression.id_name.toArray(), 0, ele.jsonElement), expression.retSchema.type);
 	}
 
 	private static JsonElement getIdValue(Object[] path, int index, JsonElement ele){
@@ -124,40 +140,40 @@ class CalcDealer extends ExpressionDealer{
 	}
 
 	@Override
-	public Element deal(Element ele) {
+	public Element deal(Element ele, Element rightEle) {
 		Element left, right;
 		switch (expression.expression_type) {
 		case ADD:
-			left = leftDealer.deal(ele);
-			right = rightDealer.deal(ele);
+			left = leftDealer.deal(ele, rightEle);
+			right = rightDealer.deal(ele, rightEle);
 			if(left.type == JsonValueType.INTEGER)
 				return new Element(new JsonPrimitive(left.jsonElement.getAsInt() + right.jsonElement.getAsInt()), JsonValueType.INTEGER);
 			else
 				return new Element(new JsonPrimitive(left.jsonElement.getAsDouble() + right.jsonElement.getAsDouble()), JsonValueType.NUMBER);
 		case SUB:
-			left = leftDealer.deal(ele);
-			right = rightDealer.deal(ele);
+			left = leftDealer.deal(ele, rightEle);
+			right = rightDealer.deal(ele, rightEle);
 			if(left.type == JsonValueType.INTEGER)
 				return new Element(new JsonPrimitive(left.jsonElement.getAsInt() - right.jsonElement.getAsInt()), JsonValueType.INTEGER);
 			else
 				return new Element(new JsonPrimitive(left.jsonElement.getAsDouble() - right.jsonElement.getAsDouble()), JsonValueType.NUMBER);
 		case MUL:
-			left = leftDealer.deal(ele);
-			right = rightDealer.deal(ele);
+			left = leftDealer.deal(ele, rightEle);
+			right = rightDealer.deal(ele, rightEle);
 			if(left.type == JsonValueType.INTEGER)
 				return new Element(new JsonPrimitive(left.jsonElement.getAsInt() * right.jsonElement.getAsInt()), JsonValueType.INTEGER);
 			else
 				return new Element(new JsonPrimitive(left.jsonElement.getAsDouble() * right.jsonElement.getAsDouble()), JsonValueType.NUMBER);
 		case DIV:
-			left = leftDealer.deal(ele);
-			right = rightDealer.deal(ele);
+			left = leftDealer.deal(ele, rightEle);
+			right = rightDealer.deal(ele, rightEle);
 			if(left.type == JsonValueType.INTEGER)
 				return new Element(new JsonPrimitive(left.jsonElement.getAsInt() / right.jsonElement.getAsInt()), JsonValueType.INTEGER);
 			else
 				return new Element(new JsonPrimitive(left.jsonElement.getAsDouble() / right.jsonElement.getAsDouble()), JsonValueType.NUMBER);
 		case MOD:
-			left = leftDealer.deal(ele);
-			right = rightDealer.deal(ele);
+			left = leftDealer.deal(ele, rightEle);
+			right = rightDealer.deal(ele, rightEle);
 			return new Element(new JsonPrimitive(left.jsonElement.getAsInt() % right.jsonElement.getAsInt()), JsonValueType.INTEGER);
 
 		default:
@@ -175,8 +191,8 @@ class AggrDealer extends ExpressionDealer{
 	}
 
 	@Override
-	public Element deal(Element ele) {
-		JsonArray array = projDealer.deal(ele).jsonElement.getAsJsonArray();
+	public Element deal(Element ele, Element rightEle) {
+		JsonArray array = projDealer.deal(ele, rightEle).jsonElement.getAsJsonArray();
 		int size = array.size();
 		JsonPrimitive jp;
 		if(expression.aggregate_operation == AggrFuncNames.count) 

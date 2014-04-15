@@ -1,5 +1,8 @@
 package operators;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import query.ConditionDealer;
 
 import json.Element;
@@ -7,8 +10,9 @@ import jsonAPI.JsonCondition;
 import jsonAPI.JsonQueryTree;
 
 public class SelectionOperator extends Operator{
-	private final JsonCondition condition;
-	private final ConditionDealer dealer;
+	private final ConditionDealer condDealer;
+	
+	private final Map<Long, Element> synopsis;
 	
 //	private static final Map<String, CondType> stringToCondType = new HashMap<String, CondType>(){{
 //		put("and", CondType.AND);
@@ -107,15 +111,24 @@ public class SelectionOperator extends Operator{
 //		}
 //	}
 	
+	private void processPlus(long id, Element ele){
+		if(condDealer.deal(ele)){
+			synopsis.put(id, ele);
+			//TODO put plus mark and output this element
+		}
+	}
 	
-	private boolean satisfyCondition(Element ele, JsonCondition cond){
-		return dealer.deal(ele);
+	private void processMinus(long id, Element ele){
+		if(synopsis.containsKey(id)){
+			synopsis.remove(id);
+			//TODO put minus mark and output this element
+		}
 	}
 	
 	public SelectionOperator(JsonQueryTree tree){
 		super(tree);
-		this.condition = tree.selection_condition;
-		dealer = ConditionDealer.genConditionDealer(condition);
+		condDealer = ConditionDealer.genConditionDealer(tree.selection_condition);
+		synopsis = new HashMap<Long, Element>();
 	}
 	@Override
 	public void execute() {
