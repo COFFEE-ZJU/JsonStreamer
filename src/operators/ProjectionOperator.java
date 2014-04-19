@@ -3,14 +3,16 @@ package operators;
 import java.util.HashMap;
 import java.util.Map;
 
+import constants.Constants.ElementMark;
+
 import query.ProjectionDealer;
+import utils.ElementIdGenerator;
 
 import json.Element;
-import json.ElementIdGenerator;
-import jsonAPI.JsonProjection;
+import json.MarkedElement;
 import jsonAPI.JsonQueryTree;
 
-public class ProjectionOperator extends Operator{
+public class ProjectionOperator extends OperatorOneInOneOut{
 	private final ProjectionDealer projDealer;
 	private final Map<Long, Element> synopsis;
 	private final Map<Long, Long> relatedMap;
@@ -21,53 +23,24 @@ public class ProjectionOperator extends Operator{
 		relatedMap = new HashMap<Long, Long>();
 	}
 	
-	private void processPlus(long id, Element ele){
+	@Override
+	protected void processPlus(MarkedElement markedElement){
+		Long id = markedElement.id;
+		Element ele = markedElement.element;
 		Element newEle = projDealer.deal(ele);
 		long newId = ElementIdGenerator.getNewId();
 		synopsis.put(newId, newEle);
-		//TODO put plus mark and output this element
+		outputQueue.add(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp));
 		relatedMap.put(id, newId);
 	}
 	
-	private void processMinus(long id){
+	@Override
+	protected void processMinus(MarkedElement markedElement){
+		Long id = markedElement.id;
 		long eleIdToDelete = relatedMap.get(id);
 		Element eleToDelete = synopsis.get(eleIdToDelete);
-		//TODO put minus mark and output this element
+		outputQueue.add(new MarkedElement(eleToDelete, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp));
 		relatedMap.remove(id);
 		synopsis.remove(eleIdToDelete);
 	}
-
-//	private JsonElement project(JsonElement ele, JsonProjection proj){
-//		switch (proj.projection_type) {
-//		case object:
-//			JsonObject obj = new JsonObject();
-//			Iterator<Entry<String, JsonProjection> > ito = proj.fields.entrySet().iterator();
-//			Entry<String, JsonProjection> ent;
-//			while(ito.hasNext()){
-//				ent = ito.next();
-//				obj.add(ent.getKey(), project(ele, ent.getValue()));
-//			}
-//			return obj;
-//		case array:
-//			JsonArray array = new JsonArray();
-//			Iterator<JsonProjection> ita = proj.array_items.iterator();
-//			while(ita.hasNext()){
-//				array.add(project(ele, ita.next()));
-//			}
-//			return array;
-//		case direct:
-//			return new Element(ele).getValue(proj.expression);
-//
-//		default:
-//			return null;
-//		}
-//	}
-	
-	@Override
-	public void execute() {
-		// TODO Auto-generated method stub
-		
-	}
-	
-
 }

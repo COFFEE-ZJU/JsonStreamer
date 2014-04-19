@@ -1,4 +1,4 @@
-package json;
+package utils;
 
 public class ElementIdGenerator {
 	private ElementIdGenerator(){};

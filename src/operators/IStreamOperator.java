@@ -1,17 +1,21 @@
 package operators;
 
+import constants.Constants.ElementMark;
+import IO.JStreamOutput;
+import json.MarkedElement;
 import jsonAPI.JsonQueryTree;
 
-public class IStreamOperator extends Operator{
+public class IStreamOperator extends OperatorRelationToStream{
 	
-	public IStreamOperator(JsonQueryTree tree) {
-		super(tree);
-		// TODO Auto-generated constructor stub
+	public IStreamOperator(JsonQueryTree tree, JStreamOutput outputStream) {
+		super(tree, outputStream);
 	}
 
 	@Override
-	public void execute() {
-		// TODO Auto-generated method stub
-		
+	protected void process(MarkedElement markedElement) {
+		if(markedElement.mark == ElementMark.PLUS){
+			markedElement.mark = ElementMark.UNMARKED;
+			outputStream.pushNext(markedElement);
+		}
 	}
 }

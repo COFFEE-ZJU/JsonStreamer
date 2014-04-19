@@ -3,20 +3,21 @@ package operators;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import query.ExpressionDealer;
 import query.ProjectionDealer;
+import utils.ElementIdGenerator;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
+import constants.Constants.ElementMark;
 import constants.Constants.JsonValueType;
 
 import json.Element;
-import json.ElementIdGenerator;
+import json.MarkedElement;
 import jsonAPI.JsonQueryTree;
 
-public class AggregationOperator extends Operator{
+public class AggregationOperator extends OperatorOneInOneOut{
 	private final Map<Integer, JsonArray> groupMap;		//groupKey's hashCode to the Element array
 	private final Map<Long, Element> synopsis;			//output Element Id to the Element
 	private final Map<Integer, Long> relatedMap;		//groupKey's hashCode to output Element Id
@@ -34,7 +35,10 @@ public class AggregationOperator extends Operator{
 		idToGroupKey = new HashMap<Long, Integer>();
 	}
 	
-	private void processPlus(long id, Element ele){
+	@Override
+	protected void processPlus(MarkedElement markedElement){
+		Long id = markedElement.id;
+		Element ele = markedElement.element;
 		int groupByKey = groupAttrDealer.deal(ele).hashCode();
 		JsonArray array;
 		if(! groupMap.containsKey(groupByKey)){
@@ -48,18 +52,22 @@ public class AggregationOperator extends Operator{
 			long eleIdToDelete = relatedMap.get(groupByKey);
 			Element eleToDelete = synopsis.get(eleIdToDelete);
 			synopsis.remove(eleIdToDelete);
-			//TODO put minus mark and output the eleToDelete
+			outputQueue.add(new MarkedElement(eleToDelete, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp));
 		}
 		Element arrayToDeal = new Element(groupMap.get(groupByKey), JsonValueType.ARRAY);
 		Element newEle = projDealer.deal(arrayToDeal);
-		//TODO put plus mark and output the newEle
 		long newId = ElementIdGenerator.getNewId();
+		outputQueue.add(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp));
+		
 		synopsis.put(newId, newEle);
 		relatedMap.put(groupByKey, newId);
 		idToGroupKey.put(id, groupByKey);
 	}
 	
-	private void processMinus(long id, Element ele){
+	@Override
+	protected void processMinus(MarkedElement markedElement){
+		Long id = markedElement.id;
+		Element ele = markedElement.element;
 		int groupByKey = idToGroupKey.get(id);
 		JsonArray array = groupMap.get(groupByKey);
 		JsonArray newA = removeElementInJsonArray(array, ele.jsonElement);
@@ -67,14 +75,14 @@ public class AggregationOperator extends Operator{
 		long eleIdToDelete = relatedMap.get(groupByKey);
 		Element eleToDelete = synopsis.get(eleIdToDelete);
 		synopsis.remove(eleIdToDelete);
-		//TODO put minus mark and output the eleToDelete
+		outputQueue.add(new MarkedElement(eleToDelete, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp));
 		
 		if(newA.size() != 0){
 			groupMap.put(groupByKey, removeElementInJsonArray(array, ele.jsonElement));
 			Element arrayToDeal = new Element(groupMap.get(groupByKey), JsonValueType.ARRAY);
 			Element newEle = projDealer.deal(arrayToDeal);
-			//TODO put plus mark and output the newEle
 			long newId = ElementIdGenerator.getNewId();
+			outputQueue.add(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp));
 			synopsis.put(newId, newEle);
 			relatedMap.put(groupByKey, newId);
 		}
@@ -87,6 +95,7 @@ public class AggregationOperator extends Operator{
 		
 	}
 	
+	
 	private JsonArray removeElementInJsonArray(JsonArray array, JsonElement ele){
 		JsonArray retA = new JsonArray();
 		Iterator<JsonElement> it = array.iterator();
@@ -97,12 +106,6 @@ public class AggregationOperator extends Operator{
 		}
 		
 		return retA;
-	}
-	
-	@Override
-	public void execute() {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

@@ -1,5 +1,8 @@
 package IO;
 
-public class JStreamOutput {
-	
+import json.MarkedElement;
+
+public interface JStreamOutput {
+	public boolean pushNext(MarkedElement ele);
+	public boolean isFull();
 }

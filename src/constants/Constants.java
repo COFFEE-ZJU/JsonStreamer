@@ -8,7 +8,10 @@ import com.google.gson.Gson;
 public class Constants {
 	public static enum OperatorState {READY, SUSPEND};
 	
-	public static enum ElementMark {PLUS, MINUS};
+	public static enum TimeUnitForNow {MILLISECOND, SECOND, MINUTE};
+	public static final TimeUnitForNow TIME_UNIT_FOR_NOW = TimeUnitForNow.SECOND;	//config
+	
+	public static enum ElementMark {PLUS, MINUS, UNMARKED};
 	public static enum JsonExprType {ID, INT, NUMBER, BOOL, NULL, STRING, ADD, SUB, DIV, MUL, MOD, AGGREGATION};
 	public static enum JsonCondType {AND, OR, NOT, GT, GE, LT, LE, EQ, NE, BOOL};
 	
