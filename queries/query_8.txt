@@ -1,0 +1,9 @@
+stream1 = readFromWrapper ("wrapper_3", true) ;
+stream2 = readFromWrapper ("wrapper_4", true) ;
+tmp1 = stream1 -> window[rows 2];
+tmp2 = stream2 -> window[rows 3];
+j = join d in tmp1,
+ preserve s in tmp2
+where s.id == d.id
+into {s.id, d.num};
+j ->istream;

@@ -1,0 +1,8 @@
+streamT = readFromWrapper ("wrapper_2", true) ;
+
+stream2 = readFromWrapper ("wrapper_1", true) ;
+
+streamT;
+
+stream2;
+

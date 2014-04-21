@@ -1,0 +1,16 @@
+{"id": "schema_5",
+           "type":"object",
+           "properties": {
+                           "id":{
+                                   "type": "string"
+                                 },       
+                           "student":
+                                 {
+                                    "type":"object",
+                                    "properties":{
+                                                     "age":{                                                                        "type":"number"
+                                                          }
+                                                  }
+                                 }
+                           }
+           }

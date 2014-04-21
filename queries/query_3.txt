@@ -1,0 +1,8 @@
+streamT = readFromWrapper ("wrapper_2", true) ;
+
+deptCnt = streamT -> window [range now] -> expand -> group each ele by d = ele.dept into {department:d, empCnt:count($), avgSalary: avg($[*].salary)};
+emps = streamT->window [range 3 hours] -> expand $ -> filter $.salary*12>=1000000 or $.is_manager;
+
+view3 = join deptCnt,preserve emps where emps.dept == deptCnt.department into {emps.name, emps.salary, avgInDept:deptCnt.avgSalary, emps.another_object.tags};
+
+view3 -> transform each emp {emp.name, emp.salary, annualDiffFromAvg:emp.salary*12 - emp.avgInDept*12, newName: emp.tags[1][2]} -> istream;

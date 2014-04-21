@@ -7,6 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.stream.JsonWriter;
 
 import constants.Constants.AggrFuncNames;
 import constants.Constants.JsonAttrSource;
@@ -90,31 +91,33 @@ class IdDealer extends ExpressionDealer{
 	@Override
 	public Element deal(Element ele, Element rightEle) {
 		if(isLeftOrGroupArray == null || rightEle == null)		//not in join or groupby
-			return new Element(getIdValue(expression.id_name.toArray(), 0, ele.jsonElement), expression.retSchema.type);
+			return new Element(getIdValue(expression.id_name.toArray(), 0, ele.jsonElement), expression.retSchema.getType());
 		
 		if(isLeftOrGroupArray == false)		//use left source in join or group array in groupby
-			return new Element(getIdValue(expression.id_name.toArray(), 0, rightEle.jsonElement), expression.retSchema.type);
+			return new Element(getIdValue(expression.id_name.toArray(), 0, rightEle.jsonElement), expression.retSchema.getType());
 		else								//use right source in join or group key var in groupby
-			return new Element(getIdValue(expression.id_name.toArray(), 0, ele.jsonElement), expression.retSchema.type);
+			return new Element(getIdValue(expression.id_name.toArray(), 0, ele.jsonElement), expression.retSchema.getType());
 	}
 
 	private static JsonElement getIdValue(Object[] path, int index, JsonElement ele){
 		if(path.length == index) return ele;
 		Object pathObj = path[index];
-		if(pathObj.getClass() == String.class) return getIdValue(path, index+1, ele.getAsJsonObject().get((String)pathObj));
-		else if(pathObj.getClass() == Double.class){
+		if(pathObj instanceof String) return getIdValue(path, index+1, ele.getAsJsonObject().get((String)pathObj));
+		else if(pathObj instanceof Double){
 			int ind = ((Double)pathObj).intValue();
 			if(ind != -1) return getIdValue(path, index+1, ele.getAsJsonArray().get(ind));
 			else{
+				//System.err.println(ele);
 				Iterator<JsonElement> it = ele.getAsJsonArray().iterator();
 				JsonArray array = new JsonArray();
 				while(it.hasNext()){
 					array.add(getIdValue(path, index+1, it.next()));
 				}
+				//System.err.println("primitive: "+array.get(0));
 				return array;
 			}
 		}
-		else if(pathObj.getClass() == ArrayList.class){
+		else if(pathObj instanceof ArrayList){
 			ArrayList<Integer> list = (ArrayList<Integer>)pathObj;
 			//if(ele.getAsJsonArray().size() <= list.get(1)) throw new IndexOutOfBoundsException();
 			Iterator<JsonElement> it = ele.getAsJsonArray().iterator();
@@ -208,7 +211,7 @@ class AggrDealer extends ExpressionDealer{
 			else jp = new JsonPrimitive(sum/size);
 		}
 		
-		return new Element(jp, expression.retSchema.type);
+		return new Element(jp, expression.retSchema.getType());
 	}
 	
 }

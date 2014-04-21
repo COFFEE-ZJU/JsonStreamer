@@ -40,7 +40,7 @@ public class ExpandOperator extends OperatorOneInOneOut{
 		Element newEle;
 		Long newId;
 		while(it.hasNext()){
-			newEle = new Element(it.next(), schema.type);
+			newEle = new Element(it.next(), schema.getType());
 			newId = ElementIdGenerator.getNewId();
 			newIds.add(newId);
 			synopsis.put(newId, newEle);

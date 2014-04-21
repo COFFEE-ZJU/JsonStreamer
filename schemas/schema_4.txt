@@ -1,0 +1,8 @@
+{"id": "schema_3",
+"type":"object",
+"properties": {
+			  "id":{
+				      "type": "string"
+			  		}
+			  }
+}

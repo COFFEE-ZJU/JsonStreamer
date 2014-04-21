@@ -6,6 +6,8 @@ import java.util.Map;
 import com.google.gson.Gson;
 
 public class Constants {
+	public static final int COMPILER_PORT = 3000;
+	public static final int SCHEMA_SERVER_PORT = 2048;
 	public static enum OperatorState {READY, SUSPEND};
 	
 	public static enum TimeUnitForNow {MILLISECOND, SECOND, MINUTE};
@@ -16,7 +18,10 @@ public class Constants {
 	public static enum JsonCondType {AND, OR, NOT, GT, GE, LT, LE, EQ, NE, BOOL};
 	
 	public static Gson gson = new Gson();
-	public static String schemaFilePath = "schemas/";
+	public static String QUERY_FILE_PATH = "queries/";
+	public static String SCHEMA_FILE_PATH = "schemas/";
+	public static String WRAPPER_FILE_PATH = "wrappers/";
+	public static String RESULT_FILE_PATH = "resultFiles/";
 	public static class WindowUnit {
 		public static final String NOW = "now";
 		public static final String UNBOUNDED = "unbounded";

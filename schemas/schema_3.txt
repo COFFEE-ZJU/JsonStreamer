@@ -1,0 +1,11 @@
+{"id": "schema_3",
+"type":"object",
+"properties": {
+			  "id":{
+				      "type": "string"
+			  		},
+  			"num":{				                                
+  			          "type":"number"
+	             }
+			  }
+}

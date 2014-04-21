@@ -1,0 +1,4 @@
+{
+	"implement_class": "TestStreamInput",
+	"schema_name": "schema_1"
+}

@@ -1,0 +1,11 @@
+ {"id": "schema_6",
+           "type":"object",
+           "properties": {
+                           "id":{
+                                   "type": "string"
+                                 },                                                                
+                                 "score":{                                                                             
+                                 "type":"number"
+                                 }
+                         }
+}

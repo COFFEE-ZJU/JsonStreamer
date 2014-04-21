@@ -1,0 +1,9 @@
+streamT = readFromWrapper ("wrapper_1", true) ;
+
+tmpv = streamT -> window[range now] -> expand each xx xx.another_object.tags[*];
+
+tv2 = tmpv -> transform [{any:$},{any:[3,4,5]}];
+
+tv2 -> transform $[0].any[1]*2 ->istream;
+
+streamT -> window[range now] -> transform $.another_object -> transform $.tags[0][4] -> transform $*7 -> dstream;

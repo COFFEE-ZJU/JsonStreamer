@@ -15,6 +15,10 @@ public class Element {
 	}
 	
 	@Override
+	public String toString(){
+		return jsonElement.toString();
+	}
+	@Override
 	public int hashCode(){
 		return jsonElement.hashCode();
 	}

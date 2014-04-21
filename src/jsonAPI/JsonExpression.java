@@ -5,8 +5,10 @@ import java.util.List;
 import json.JsonSchema;
 
 //import others.JsonSchema;
+import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 
+import constants.Constants;
 import constants.Constants.AggrFuncNames;
 import constants.Constants.JsonAttrSource;
 import constants.Constants.JsonExprType;
@@ -37,6 +39,10 @@ public class JsonExpression {
 		else throw new SemanticErrorException("need a field name");
 	}
 	
+	@Override
+	public String toString(){
+		return Constants.gson.toJson(this);
+	}
 //	Constants.JsonValueType retType = null;
 //	Constants.JsonValueType arrayDataType = null;
 //	JsonSchema objectSchema = null;

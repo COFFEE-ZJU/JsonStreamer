@@ -78,7 +78,7 @@ class ObjectDealer extends ProjectionDealer{
 			ent = it.next();
 			obj.add(ent.getKey(), ent.getValue().deal(ele, rightEle).jsonElement);
 		}
-		return new Element(obj, projection.retSchema.type);
+		return new Element(obj, projection.retSchema.getType());
 	}
 }
 
@@ -96,7 +96,7 @@ class ArrayDealer extends ProjectionDealer{
 		JsonArray array = new JsonArray();
 		Iterator<ProjectionDealer> it = list.iterator();
 		while(it.hasNext()) array.add(it.next().deal(ele, rightEle).jsonElement);
-		return new Element(array, projection.retSchema.type);
+		return new Element(array, projection.retSchema.getType());
 	}
 	
 }

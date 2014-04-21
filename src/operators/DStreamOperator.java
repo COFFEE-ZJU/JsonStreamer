@@ -1,21 +1,21 @@
 package operators;
 
-import IO.JStreamOutput;
-
 import constants.Constants.ElementMark;
 import json.MarkedElement;
 import jsonAPI.JsonQueryTree;
 
-public class DStreamOperator extends OperatorRelationToStream{
-	public DStreamOperator(JsonQueryTree tree, JStreamOutput outputStream) {
-		super(tree, outputStream);
+public class DStreamOperator extends OperatorOneInOneOut{
+	public DStreamOperator(JsonQueryTree tree) {
+		super(tree);
 	}
 
 	@Override
-	protected void process(MarkedElement markedElement) {
-		if(markedElement.mark == ElementMark.MINUS){
-			markedElement.mark = ElementMark.UNMARKED;
-			outputStream.pushNext(markedElement);
-		}
+	protected void processMinus(MarkedElement markedElement) {
+		markedElement.mark = ElementMark.UNMARKED;
+		outputQueue.add(markedElement);
+	}
+
+	@Override
+	protected void processPlus(MarkedElement markedElement) {
 	}
 }

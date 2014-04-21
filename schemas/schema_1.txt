@@ -1,0 +1,35 @@
+{
+	"id": "schema_1",
+	"type":"object",
+	"properties": {
+		"dept":{
+			"type": "string"
+		},
+		"name":{
+			"type": "string"
+		},
+		"salary":{
+			"type": "integer"
+		},
+		"is_manager":{
+			"type": "boolean"
+		},
+		"another_object": {
+			"type": "object",
+			"properties": {
+				"tags": {
+					"type": "array",
+					"items":{
+						"type": "array",
+						"items": {
+							"type": "integer"
+						}
+					}
+				},
+				"a_string": {
+					"type": "string"
+				}
+			}
+		}
+	}
+}

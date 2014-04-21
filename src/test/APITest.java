@@ -46,7 +46,7 @@ public class APITest {
 		
 		JsonSchema s = new Gson().fromJson(api, JsonSchema.class);
 		
-		System.out.println(s.nameToSchema.values());
+		System.out.println(s.properties.values());
 	}
 
 	public static void main(String[] args) {

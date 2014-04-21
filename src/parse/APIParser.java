@@ -1,5 +1,6 @@
 package parse;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -12,23 +13,26 @@ import IO.JStreamOutput;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import constants.Constants.JsonOpType;
+import constants.SystemErrorException;
 
 import operators.*;
 
 public class APIParser {
 	private JStreamOutput outStream;
+	private List<Operator> opList;
 	
-	public Operator parse(String jsonApiString, JStreamOutput outStream){
+	public List<Operator> parse(String jsonApiString, JStreamOutput outStream){
 		List<JsonQueryTree> jqt = new Gson().fromJson(jsonApiString, new TypeToken<List<JsonQueryTree> >(){}.getType());
-		if(jqt.size() == 1 && jqt.get(0).type == JsonOpType.root){
-			this.outStream = outStream;
-			return parse(jqt.get(0));
+		this.outStream = outStream;
+		opList = new LinkedList<Operator>();
+		Iterator<JsonQueryTree> it = jqt.iterator();
+		JsonQueryTree curTree;
+		while(it.hasNext()){
+			curTree = it.next();
+			parse(curTree);
 		}
-		else{
-			System.err.println("error occours");	//TODO
-			return null;
-		}
+
+		return opList;
 	}
 	
 	private Operator parse(JsonQueryTree tree){
@@ -36,7 +40,9 @@ public class APIParser {
 		
 		switch (tree.type) {
 		case root:
-			retOp = parse(tree.input);
+			retOp = new RootOperator(tree, outStream);
+			subOp = parse(tree.input);
+			connectOperators(retOp, subOp);
 			break;
 		case leaf:
 			retOp = new LeafOperator(tree);
@@ -52,17 +58,17 @@ public class APIParser {
 			connectOperators(retOp, subOp);
 			break;
 		case dstream:
-			retOp = new DStreamOperator(tree, outStream);
+			retOp = new DStreamOperator(tree);
 			subOp = parse(tree.input);
 			connectOperators(retOp, subOp);
 			break;
 		case rstream:
-			retOp = new RStreamOperator(tree, outStream);
+			retOp = new RStreamOperator(tree);
 			subOp = parse(tree.input);
 			connectOperators(retOp, subOp);
 			break;
 		case istream:
-			retOp = new IStreamOperator(tree, outStream);
+			retOp = new IStreamOperator(tree);
 			subOp = parse(tree.input);
 			connectOperators(retOp, subOp);
 			break;
@@ -95,12 +101,15 @@ public class APIParser {
 		case partitionwindow:
 			//TODO not supported now
 			break;
-
+		case error:
+			throw new SystemErrorException(tree.error_message);
+			
 		default:
 			//TODO error occurs
 			break;
 		}
 		
+		opList.add(retOp);
 		return retOp;
 	}
 	
@@ -115,7 +124,7 @@ public class APIParser {
 		queueRight = new LinkedList<MarkedElement>();
 		recOp.addInputQueue(queueLeft);
 		recOp.addInputQueue(queueRight);
-		sendOpLeft.addInputQueue(queueLeft);
-		sendOpRight.addInputQueue(queueRight);
+		sendOpLeft.addOutputQueue(queueLeft);
+		sendOpRight.addOutputQueue(queueRight);
 	}
 }

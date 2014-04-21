@@ -60,7 +60,7 @@ public class RangeWindowOperator extends OperatorStreamToRelation{
 		if(timeRange != -1){
 			long cutTime = markedElement.timeStamp - timeRange;
 			MarkedElement me;
-			while(true){
+			while(! synopsis.isEmpty()){
 				me = synopsis.peek();
 				if(me.timeStamp <= cutTime){
 					synopsis.poll();

@@ -1,0 +1,9 @@
+stream1 = readFromWrapper ("wrapper_5", true) ;
+stream2 = readFromWrapper ("wrapper_6", true) ;
+tmp1 = stream1 -> window[rows 2] ->  transform {$.id,$.student.age};
+tmp2 = stream2 -> window[rows 3] ->  filter $.score >= 60.0;
+j = join s in tmp1,
+         d in tmp2
+    where s.id == d.id
+    into {s.age, d.score};
+j -> istream;

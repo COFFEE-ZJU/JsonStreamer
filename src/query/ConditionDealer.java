@@ -1,6 +1,9 @@
 package query;
 
+import com.google.gson.JsonPrimitive;
+
 import constants.Constants.JsonCondType;
+import constants.SystemErrorException;
 import json.Element;
 import jsonAPI.JsonCondition;
 
@@ -88,6 +91,7 @@ class CompareDealer extends ConditionDealer{
 	@Override
 	public boolean deal(Element ele) {
 		Element left,right;
+		JsonPrimitive leftP,rightP;
 		switch (condition.condition_type) {
 		case EQ:
 			left = leftDealer.deal(ele);
@@ -97,38 +101,40 @@ class CompareDealer extends ConditionDealer{
 		case NE:
 			left = leftDealer.deal(ele);
 			right = rightDealer.deal(ele);
-			switch (left.type) {
-			case BOOLEAN:
-				return left.jsonElement.getAsBoolean() != right.jsonElement.getAsBoolean();
-			case INTEGER:
-			case NUMBER:
-				return left.jsonElement.getAsDouble() != right.jsonElement.getAsDouble();
-			case NULL:
-				return left.jsonElement.isJsonNull() != left.jsonElement.isJsonNull();
-			case STRING:
-				return ! left.jsonElement.getAsString().equals(right.jsonElement.getAsString());
-			case ARRAY: //TODO
-			case OBJECT: //TODO
-
-			default:
-				return false;
-			}
+			return !left.equals(right);
+//			switch (left.type) {
+//			case BOOLEAN:
+//				return left.jsonElement.getAsBoolean() != right.jsonElement.getAsBoolean();
+//			case INTEGER:
+//			case NUMBER:
+//				return left.jsonElement.getAsDouble() != right.jsonElement.getAsDouble();
+//			case NULL:
+//				return left.jsonElement.isJsonNull() != left.jsonElement.isJsonNull();
+//			case STRING:
+//				return ! left.jsonElement.getAsString().equals(right.jsonElement.getAsString());
+//			case ARRAY: //TODO
+//			case OBJECT: //TODO
+//
+//			default:
+//				return false;
+//			}
 		case LT:
 			left = rightDealer.deal(ele);		//the opposite way, reduce code redundancy
 			right = leftDealer.deal(ele);
 		case GT:
-			left = leftDealer.deal(ele);
-			right = rightDealer.deal(ele);
-			switch (left.type) {
-			case INTEGER:
-			case NUMBER:
-				return left.jsonElement.getAsDouble() > right.jsonElement.getAsDouble();
-			case STRING:
-				return left.jsonElement.getAsString().compareTo(right.jsonElement.getAsString()) > 0;
-
-			default:
-				return false;
-			}
+			leftP = leftDealer.deal(ele).jsonElement.getAsJsonPrimitive();
+			rightP = rightDealer.deal(ele).jsonElement.getAsJsonPrimitive();
+			
+//			switch (left.type) {
+//			case INTEGER:
+//			case NUMBER:
+//				return left.jsonElement.getAsDouble() > right.jsonElement.getAsDouble();
+//			case STRING:
+//				return left.jsonElement.getAsString().compareTo(right.jsonElement.getAsString()) > 0;
+//
+//			default:
+//				return false;
+//			}
 			
 		case LE:
 			left = rightDealer.deal(ele);		//the opposite way, reduce code redundancy

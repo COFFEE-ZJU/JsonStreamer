@@ -2,6 +2,8 @@ package jsonAPI;
 
 import json.JsonSchema;
 import com.google.gson.annotations.Expose;
+
+import constants.Constants;
 import constants.Constants.JsonOpType;
 
 public class JsonQueryTree {
@@ -29,4 +31,9 @@ public class JsonQueryTree {
 	
 	@Expose public JsonSchema schema = null;
 //	public DataType dataType = null;
+	
+	@Override
+	public String toString(){
+		return Constants.gson.toJson(this);
+	}
 }

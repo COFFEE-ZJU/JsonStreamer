@@ -3,6 +3,8 @@ package IO;
 import java.util.HashMap;
 import java.util.Map;
 
+import wrapper.WrapperManager;
+
 import constants.SystemErrorException;
 
 public class IOManager {
@@ -25,18 +27,20 @@ public class IOManager {
 		
 		return outputStreamMap.get(streamName);
 	}
-	public JStreamInput getInputStreamByName(String streamName){
-		if(! inputStreamMap.containsKey(streamName))
-			throw new SystemErrorException("stream: "+streamName+" not exist!");
+	public JStreamInput getInputStreamByName(String wrapperName){
+		if(! inputStreamMap.containsKey(wrapperName)){
+			JStreamInput stream = WrapperManager.getStreamInputByWrapper(wrapperName);
+			inputStreamMap.put(wrapperName, stream);
+		}
 		
-		return inputStreamMap.get(streamName);
+		return inputStreamMap.get(wrapperName);
 	}
 	
-	public boolean registerInputStream(String streamName, JStreamInput inputStream){
-		if(inputStreamMap.containsKey(streamName))
+	public boolean registerInputStream(String wrapperName, JStreamInput inputStream){
+		if(inputStreamMap.containsKey(wrapperName))
 			return false;
 		
-		inputStreamMap.put(streamName, inputStream);
+		inputStreamMap.put(wrapperName, inputStream);
 		return true;
 	}
 	

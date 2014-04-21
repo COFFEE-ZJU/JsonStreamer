@@ -21,7 +21,8 @@ public abstract class OperatorOneInOneOut extends Operator{
 	@Override
 	public final void execute() {
 		if(inputQueue == null || outputQueue == null){
-			if(inputQueueList.size() != 1 || outputQueueList.size() != 1) throw new SystemErrorException("queue size abnormal");
+			if(inputQueueList.size() != 1 || outputQueueList.size() != 1)
+				throw new SystemErrorException("queue size abnormal");
 			inputQueue = inputQueueList.get(0);
 			outputQueue = outputQueueList.get(0);
 		}

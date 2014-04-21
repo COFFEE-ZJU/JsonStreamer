@@ -9,6 +9,7 @@ import json.JsonSchema;
 
 import com.google.gson.annotations.Expose;
 
+import constants.Constants;
 import constants.Constants.JsonProjectionType;
 
 public class JsonProjection {
@@ -21,4 +22,9 @@ public class JsonProjection {
 	@Expose public JsonExpression expression = null;		//for primitive type
 	
 	@Expose public JsonSchema retSchema = null;
+	
+	@Override
+	public String toString(){
+		return Constants.gson.toJson(this);
+	}
 }

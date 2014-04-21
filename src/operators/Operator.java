@@ -1,5 +1,6 @@
 package operators;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
@@ -23,6 +24,8 @@ public abstract class Operator {
 	
 	public Operator(JsonQueryTree tree){
 		schema = tree.schema;
+		inputQueueList = new LinkedList<Queue<MarkedElement> >();
+		outputQueueList = new LinkedList<Queue<MarkedElement> >();
 	}
 	
 	public abstract void execute();

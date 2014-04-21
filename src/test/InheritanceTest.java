@@ -17,8 +17,14 @@ public class InheritanceTest {
 	public void test1(){
 		Father f = new Son(100);
 	}
+	
+	public void test2(){
+		double dd = 10.01;
+		Object oo = (Object)dd;
+		System.out.println(oo instanceof Double);
+	}
 	public static void main(String[] args) {
-		new InheritanceTest().test1();
+		new InheritanceTest().test2();
 
 	}
 
