@@ -17,7 +17,7 @@ public class RootOperator extends Operator{
 	}
 	
 	@Override
-	public final void execute(){
+	public final void execute() throws SystemErrorException{
 		if(inputQueue == null){
 			if(inputQueueList.size() != 1)
 				throw new SystemErrorException("queue size abnormal");

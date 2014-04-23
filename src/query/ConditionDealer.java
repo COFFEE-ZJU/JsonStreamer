@@ -102,22 +102,7 @@ class CompareDealer extends ConditionDealer{
 			left = leftDealer.deal(ele);
 			right = rightDealer.deal(ele);
 			return !left.equals(right);
-//			switch (left.type) {
-//			case BOOLEAN:
-//				return left.jsonElement.getAsBoolean() != right.jsonElement.getAsBoolean();
-//			case INTEGER:
-//			case NUMBER:
-//				return left.jsonElement.getAsDouble() != right.jsonElement.getAsDouble();
-//			case NULL:
-//				return left.jsonElement.isJsonNull() != left.jsonElement.isJsonNull();
-//			case STRING:
-//				return ! left.jsonElement.getAsString().equals(right.jsonElement.getAsString());
-//			case ARRAY: //TODO
-//			case OBJECT: //TODO
-//
-//			default:
-//				return false;
-//			}
+
 		case LT:
 			left = rightDealer.deal(ele);		//the opposite way, reduce code redundancy
 			right = leftDealer.deal(ele);

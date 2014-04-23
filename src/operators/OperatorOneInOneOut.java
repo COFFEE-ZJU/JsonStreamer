@@ -15,11 +15,11 @@ public abstract class OperatorOneInOneOut extends Operator{
 	protected Queue<MarkedElement> inputQueue = null;
 	protected Queue<MarkedElement> outputQueue = null;
 	
-	protected abstract void processMinus(MarkedElement markedElement);
-	protected abstract void processPlus(MarkedElement markedElement);
+	protected abstract void processMinus(MarkedElement markedElement) throws SystemErrorException;
+	protected abstract void processPlus(MarkedElement markedElement) throws SystemErrorException;
 	
 	@Override
-	public final void execute() {
+	public final void execute() throws SystemErrorException {
 		if(inputQueue == null || outputQueue == null){
 			if(inputQueueList.size() != 1 || outputQueueList.size() != 1)
 				throw new SystemErrorException("queue size abnormal");

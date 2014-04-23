@@ -10,6 +10,7 @@ import wrapper.WrapperManager;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import json.JsonSchema;
 import constants.Constants;
@@ -32,12 +33,12 @@ public class JsonSchemaUtils {
 //		SchemaFormat items;
 //	}
 	
-	public static JsonSchema getSchemaByWrapperName(String wrapperName){
+	public static JsonSchema getSchemaByWrapperName(String wrapperName) throws SystemErrorException{
 		Wrapper wrapper = WrapperManager.getWrapperByName(wrapperName);
 		return getSchemaBySchemaName(wrapper.schema_name);
 	}
 	
-	public static JsonSchema getSchemaBySchemaName(String schemaName){
+	public static JsonSchema getSchemaBySchemaName(String schemaName) throws SystemErrorException{
 		File file = new File(Constants.SCHEMA_FILE_PATH + schemaName + ".txt");
 		Long fileLengthLong = file.length();
 		byte[] fileContent = new byte[fileLengthLong.intValue()];
@@ -67,6 +68,7 @@ public class JsonSchemaUtils {
 				}
 				return true;
 			}
+			
 		case OBJECT:
 			if(! ele.isJsonObject()) return false;
 			else{
@@ -80,31 +82,28 @@ public class JsonSchemaUtils {
 				}
 				return true;
 			}
+			
 		case NULL:
 			if(! ele.isJsonNull()) return false;
 			else return true;
+			
 		case BOOLEAN:
 			if(! ele.isJsonPrimitive()) return false;
+			else return ele.getAsJsonPrimitive().isBoolean();
+			
+		case INTEGER:
+			if(! ele.isJsonPrimitive()) return false;
 			else{
-				Object o = Constants.gson.fromJson(ele, Object.class);
-				if(o.getClass() == Boolean.class) return true;
-				else return false;
+				JsonPrimitive jp = ele.getAsJsonPrimitive();
+				if(! jp.isNumber()) return false;
+				else return ! ele.toString().contains(".");
 			}
-		case INTEGER:		//TODO how to tell?
 		case NUMBER:
 			if(! ele.isJsonPrimitive()) return false;
-			else{
-				Object o = Constants.gson.fromJson(ele, Object.class);
-				if(o.getClass() == Double.class) return true;
-				else return false;
-			}
+			else return ele.getAsJsonPrimitive().isNumber();
 		case STRING:
 			if(! ele.isJsonPrimitive()) return false;
-			else{
-				Object o = Constants.gson.fromJson(ele, Object.class);
-				if(o.getClass() == String.class) return true;
-				else return false;
-			}
+			else return ele.getAsJsonPrimitive().isString();
 			
 		default:
 			return false;

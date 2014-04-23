@@ -14,7 +14,6 @@ public class ReflectTest {
 			Object o = constructor.newInstance(123);
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

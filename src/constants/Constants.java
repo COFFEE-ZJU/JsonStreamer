@@ -8,14 +8,25 @@ import com.google.gson.Gson;
 public class Constants {
 	public static final int COMPILER_PORT = 3000;
 	public static final int SCHEMA_SERVER_PORT = 2048;
+	public static final int LISTEN_PORT = 2703;
+	public static final int THREAD_POOL_NUM = 20;
+	public static final int INPUT_STREAM_LENGTH = 1024;
+	public static String USER_PREFIX = "USER:";
+	public static String PW_PREFIX = "PW:";
+	public static String QUERY_START = "QUERY_START";
+	public static String QUERY_PREFIX = "QUERY:";
+	public static String QUERY_END = "QUERY_END";
+	public static String QUIT = "QUIT";
+	
 	public static enum OperatorState {READY, SUSPEND};
 	
 	public static enum TimeUnitForNow {MILLISECOND, SECOND, MINUTE};
-	public static final TimeUnitForNow TIME_UNIT_FOR_NOW = TimeUnitForNow.SECOND;	//config
+	public static final TimeUnitForNow TIME_UNIT_FOR_NOW = TimeUnitForNow.SECOND;	//configuration
 	
 	public static enum ElementMark {PLUS, MINUS, UNMARKED};
 	public static enum JsonExprType {ID, INT, NUMBER, BOOL, NULL, STRING, ADD, SUB, DIV, MUL, MOD, AGGREGATION};
 	public static enum JsonCondType {AND, OR, NOT, GT, GE, LT, LE, EQ, NE, BOOL};
+	public static enum ErrorType {SEMANTIC_ERROR, SYNTAX_ERROR, SYSTEM_ERROR};
 	
 	public static Gson gson = new Gson();
 	public static String QUERY_FILE_PATH = "queries/";

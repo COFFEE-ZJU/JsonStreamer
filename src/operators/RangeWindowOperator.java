@@ -9,7 +9,7 @@ import constants.SystemErrorException;
 
 public class RangeWindowOperator extends OperatorStreamToRelation{
 	private final long timeRange;		//time unit: millisecond  0 for now; -1 for unbounded
-	public RangeWindowOperator(JsonQueryTree tree){
+	public RangeWindowOperator(JsonQueryTree tree) throws SystemErrorException{
 		super(tree);
 		String time = (String)tree.windowsize;
 		String[] times = time.split(" ");
@@ -26,11 +26,11 @@ public class RangeWindowOperator extends OperatorStreamToRelation{
 					timeRange = 60 * 1000;
 					break;
 				default:
-					throw new SystemErrorException();
+					throw new SystemErrorException("wrong API");
 				}
 			}
 			else if(times[0].equals(WindowUnit.UNBOUNDED)) timeRange = -1;
-			else throw new SystemErrorException();
+			else throw new SystemErrorException("wrong API");
 		}
 		else if(times.length == 2){
 			int num = Integer.valueOf(times[0]);
@@ -49,10 +49,10 @@ public class RangeWindowOperator extends OperatorStreamToRelation{
 				break;
 
 			default:
-				throw new SystemErrorException();
+				throw new SystemErrorException("wrong API");
 			}
 		}
-		else throw new SystemErrorException();
+		else throw new SystemErrorException("wrong API");
 	}
 
 	@Override

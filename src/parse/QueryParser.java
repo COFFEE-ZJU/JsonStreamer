@@ -1,6 +1,7 @@
 package parse;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,18 +13,31 @@ import constants.SystemErrorException;
 
 public class QueryParser {
 	public static final int SEND_PORT = Constants.COMPILER_PORT;
-	public static String parseToAPI(String queryFileName){
+	
+	public static String parseToAPIByFile(String queryFileName) throws SystemErrorException{
+		BufferedReader reader;
 		try {
-			Socket socket = new Socket("localhost", SEND_PORT);
-			InputStream in = socket.getInputStream();
-			OutputStream out = socket.getOutputStream();
-			BufferedReader reader = new BufferedReader(new FileReader(Constants.QUERY_FILE_PATH + queryFileName + ".txt"));
+			reader = new BufferedReader(new FileReader(Constants.QUERY_FILE_PATH + queryFileName + ".txt"));
 			StringBuffer outString = new StringBuffer();
 			String tmp;
 			while((tmp = reader.readLine()) != null){
 				outString.append(tmp+"\r\n");
 			}
-			out.write(outString.toString().getBytes());
+			
+			return parseToAPI(outString.toString());
+		}catch (IOException e) {
+			e.printStackTrace();
+			throw new SystemErrorException(e);
+		}
+	}
+	
+	public static String parseToAPI(String query) throws SystemErrorException{
+		try {
+			Socket socket = new Socket("localhost", SEND_PORT);
+			InputStream in = socket.getInputStream();
+			OutputStream out = socket.getOutputStream();
+			
+			out.write(query.getBytes());
 			out.flush();
 			
 			byte[] b = new byte[102400];

@@ -22,7 +22,7 @@ public class LeafOperator extends Operator{
 	private JStreamInput inputStream;
 	private Queue<MarkedElement> outputQueue = null;
 	
-	public LeafOperator(JsonQueryTree tree){
+	public LeafOperator(JsonQueryTree tree) throws SystemErrorException{
 		super(tree);
 		inputStream = IOManager.getInstance().getInputStreamByName(tree.stream_source);
 		inputStream.execute();
@@ -30,7 +30,7 @@ public class LeafOperator extends Operator{
 	}
 	
 	@Override
-	public void execute() {
+	public void execute() throws SystemErrorException {
 		if(outputQueue == null){
 			if(outputQueueList.size() != 1){
 				System.err.println(outputQueueList.size());

@@ -1,11 +1,11 @@
 package IO;
 
+import constants.SystemErrorException;
 import json.Element;
-import json.JsonSchema;
 
 public interface JStreamInput {
 	//private JsonSchema schema;
-	public Element getNextElement();
+	public Element getNextElement() throws SystemErrorException;
 	public boolean isEmpty();
 	public void execute();
 }

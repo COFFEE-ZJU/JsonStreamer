@@ -21,13 +21,13 @@ public class IOManager {
 		
 		return ioManager;
 	}
-	public JStreamOutput getOutputStreamByName(String streamName){
+	public JStreamOutput getOutputStreamByName(String streamName) throws SystemErrorException{
 		if(! outputStreamMap.containsKey(streamName))
 			throw new SystemErrorException("stream: "+streamName+" not exist!");
 		
 		return outputStreamMap.get(streamName);
 	}
-	public JStreamInput getInputStreamByName(String wrapperName){
+	public JStreamInput getInputStreamByName(String wrapperName) throws SystemErrorException{
 		if(! inputStreamMap.containsKey(wrapperName)){
 			JStreamInput stream = WrapperManager.getStreamInputByWrapper(wrapperName);
 			inputStreamMap.put(wrapperName, stream);

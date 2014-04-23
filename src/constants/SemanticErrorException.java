@@ -1,6 +1,6 @@
 package constants;
 
-public class SemanticErrorException extends RuntimeException{
+public class SemanticErrorException extends JsonStreamerException{
 	private static final long serialVersionUID = 214366107273386698L;
 	public SemanticErrorException(){};
 	public SemanticErrorException(Exception e){

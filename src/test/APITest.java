@@ -21,7 +21,6 @@ public class APITest {
 		        inputStream.read(fileContent);
 		        inputStream.close();
 		} catch (Exception e) {
-			// TODO: handle exception
 		}
 		String api = new String(fileContent);
 		
@@ -40,7 +39,6 @@ public class APITest {
 		        inputStream.read(fileContent);
 		        inputStream.close();
 		} catch (Exception e) {
-			// TODO: handle exception
 		}
 		String api = new String(fileContent);
 		

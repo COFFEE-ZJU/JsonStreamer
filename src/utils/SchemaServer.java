@@ -1,7 +1,5 @@
 package utils;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -10,11 +8,10 @@ import java.net.Socket;
 
 import json.JsonSchema;
 
-import wrapper.WrapperManager;
-
 import com.google.gson.Gson;
 
 import constants.Constants;
+import constants.SystemErrorException;
 
 public class SchemaServer extends Thread{
 	
@@ -34,8 +31,8 @@ public class SchemaServer extends Thread{
 				new ExecThread(s).start();
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 	class ExecThread extends Thread{
@@ -65,6 +62,8 @@ public class SchemaServer extends Thread{
 				socket.close();
 				
 			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (SystemErrorException e) {
 				e.printStackTrace();
 			}
 		}

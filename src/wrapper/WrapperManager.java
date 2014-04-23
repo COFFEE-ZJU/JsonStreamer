@@ -13,7 +13,7 @@ import IO.JStreamInput;
 import IO.TestStreamInput;
 
 public class WrapperManager {
-	public static Wrapper getWrapperByName(String wrapperName){
+	public static Wrapper getWrapperByName(String wrapperName) throws SystemErrorException{
 		File file = new File(Constants.WRAPPER_FILE_PATH + wrapperName + ".txt");
 		Long fileLengthLong = file.length();
 		byte[] fileContent = new byte[fileLengthLong.intValue()];
@@ -32,12 +32,12 @@ public class WrapperManager {
 		return wrapper;
 	}
 	
-	public static JStreamInput getStreamInputByWrapperForTest(String wrapperName){
+	public static JStreamInput getStreamInputByWrapperForTest(String wrapperName) throws SystemErrorException{
 		JsonSchema schema = JsonSchemaUtils.getSchemaBySchemaName(wrapperName);
 		return new TestStreamInput(schema);
 	}
 	
-	public static JStreamInput getStreamInputByWrapper(String wrapperName){
+	public static JStreamInput getStreamInputByWrapper(String wrapperName) throws SystemErrorException{
 		Wrapper wrapper = getWrapperByName(wrapperName);
 		try {
 			Class<?> c = Class.forName("IO."+wrapper.implement_class);

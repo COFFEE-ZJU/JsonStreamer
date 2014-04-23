@@ -51,8 +51,7 @@ public class Element {
 //				ele2 = it2.next();
 //				
 //			}
-//		case OBJECT: //TODO
-//
+//		case OBJECT: 
 //		default:
 //			return false;
 //		}

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Queue;
 
 import json.MarkedElement;
+import jsonAPI.JsonError;
 import jsonAPI.JsonQueryTree;
 
 import IO.JStreamOutput;
@@ -13,6 +14,9 @@ import IO.JStreamOutput;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import constants.JsonStreamerException;
+import constants.SemanticErrorException;
+import constants.SyntaxErrorException;
 import constants.SystemErrorException;
 
 import operators.*;
@@ -21,7 +25,7 @@ public class APIParser {
 	private JStreamOutput outStream;
 	private List<Operator> opList;
 	
-	public List<Operator> parse(String jsonApiString, JStreamOutput outStream){
+	public List<Operator> parse(String jsonApiString, JStreamOutput outStream) throws JsonStreamerException{
 		List<JsonQueryTree> jqt = new Gson().fromJson(jsonApiString, new TypeToken<List<JsonQueryTree> >(){}.getType());
 		this.outStream = outStream;
 		opList = new LinkedList<Operator>();
@@ -35,7 +39,7 @@ public class APIParser {
 		return opList;
 	}
 	
-	private Operator parse(JsonQueryTree tree){
+	private Operator parse(JsonQueryTree tree) throws JsonStreamerException{
 		Operator retOp = null, subOp = null, subOp2 = null;
 		
 		switch (tree.type) {
@@ -99,14 +103,19 @@ public class APIParser {
 			connectOperators(retOp, subOp, subOp2);
 			break;
 		case partitionwindow:
-			//TODO not supported now
-			break;
+			throw new SemanticErrorException("partition window not supported yet");
 		case error:
-			throw new SystemErrorException(tree.error_message);
+			JsonError error = tree.error_info;
+			switch (error.error_type) {
+			case SEMANTIC_ERROR:
+				throw new SemanticErrorException(error.error_message);
+			case SYNTAX_ERROR:
+				throw new SyntaxErrorException(error.error_message);
+			}
+			break;
 			
 		default:
-			//TODO error occurs
-			break;
+			throw new SystemErrorException("shouldn't be here");
 		}
 		
 		opList.add(retOp);

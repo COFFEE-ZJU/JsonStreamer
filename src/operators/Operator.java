@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Queue;
 
 import constants.Constants.OperatorState;
+import constants.SystemErrorException;
 
 import json.Element;
 import json.JsonSchema;
@@ -28,7 +29,7 @@ public abstract class Operator {
 		outputQueueList = new LinkedList<Queue<MarkedElement> >();
 	}
 	
-	public abstract void execute();
+	public abstract void execute() throws SystemErrorException;
 	public OperatorState getState(){
 		return state;
 	}

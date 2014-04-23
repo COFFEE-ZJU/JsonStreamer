@@ -119,7 +119,7 @@ public class JoinOperator extends Operator{
 	}
 
 	@Override
-	public void execute() {
+	public void execute() throws SystemErrorException {
 		if(leftInputQueue == null || rightInputQueue == null || outputQueue == null){
 			if(inputQueueList.size() != 2 || outputQueueList.size() != 1)
 				throw new SystemErrorException("queue size abnormal");

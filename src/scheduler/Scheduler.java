@@ -11,33 +11,45 @@ import operators.Operator;
 public class Scheduler {
 	private List<Operator> opList = null;
 	private Iterator<Operator> iterator = null;
+	private static Scheduler scheduler = null;
 	
-	public Scheduler(List<Operator> opList){
-		this.opList = new LinkedList<Operator>(opList);
-		iterator = this.opList.iterator();
+	public static Scheduler getInstance(){
+		if(scheduler == null) scheduler = new Scheduler();
+		
+		return scheduler;
 	}
 	
 	public boolean isEmpty(){
-		return opList == null || opList.isEmpty();
+		synchronized (opList) {
+			return opList == null || opList.isEmpty();
+		}
 	}
 	
 	public void addOperator(Operator operator){
-		opList.add(operator);
-		iterator = opList.iterator();
+		synchronized (opList) {
+			if(opList == null) opList = new LinkedList<Operator>();
+			opList.add(operator);
+			iterator = opList.iterator();
+		}
 	}
 	
 	public void addOperators(List<Operator> operatorList){
-		this.opList.addAll(operatorList);
-		iterator = opList.iterator();
+		synchronized (opList) {
+			if(opList == null) opList = new LinkedList<Operator>();
+			this.opList.addAll(operatorList);
+			iterator = opList.iterator();
+		}
 	}
 	
-	public Operator getNextOperator(){
-		if(isEmpty())
-			throw new SystemErrorException("operation list empty");
-		if(iterator.hasNext()) return iterator.next();
-		else{
-			iterator = opList.iterator();
-			return iterator.next();
+	public Operator getNextOperator() throws SystemErrorException{
+		synchronized (opList) {
+			if(isEmpty())
+				throw new SystemErrorException("operation list empty");
+			if(iterator.hasNext()) return iterator.next();
+			else{
+				iterator = opList.iterator();
+				return iterator.next();
+			}
 		}
 	}
 }

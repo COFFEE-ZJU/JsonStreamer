@@ -27,7 +27,7 @@ public class JsonQueryTree {
 	@Expose public JsonQueryTree left_input = null;
 	@Expose public JsonQueryTree right_input = null;
 	
-	@Expose public String error_message = null;
+	@Expose public JsonError error_info = null;
 	
 	@Expose public JsonSchema schema = null;
 //	public DataType dataType = null;

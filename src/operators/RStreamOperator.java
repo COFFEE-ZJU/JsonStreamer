@@ -29,7 +29,7 @@ public class RStreamOperator extends OperatorOneInOneOut{
 	}
 
 	@Override
-	protected void processMinus(MarkedElement markedElement) {
+	protected void processMinus(MarkedElement markedElement) throws SystemErrorException {
 		if(! synopsis.remove(markedElement.element))
 			throw new SystemErrorException("element not found!!!");
 		
