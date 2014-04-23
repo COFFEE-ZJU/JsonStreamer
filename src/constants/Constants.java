@@ -11,6 +11,7 @@ public class Constants {
 	public static final int LISTEN_PORT = 2703;
 	public static final int THREAD_POOL_NUM = 20;
 	public static final int INPUT_STREAM_LENGTH = 1024;
+	public static final int SERVER_ACCEPT_TIMEOUT = 1000;
 	public static String USER_PREFIX = "USER:";
 	public static String PW_PREFIX = "PW:";
 	public static String QUERY_START = "QUERY_START";
