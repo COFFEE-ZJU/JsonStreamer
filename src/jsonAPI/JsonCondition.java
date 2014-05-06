@@ -5,7 +5,7 @@ import constants.Constants;
 import constants.Constants.JsonCondType;
 
 public class JsonCondition {
-	@Expose public String type = "condition_obj";
+	@Expose public String type = "CONDITION_OBJ";
 	@Expose public JsonCondType condition_type = null;		//AND, OR, NOT, GT, GE, LT, LE, EQ, NE, BOOL
 	@Expose public JsonCondition condition = null;
 	@Expose public JsonCondition left_condition = null;

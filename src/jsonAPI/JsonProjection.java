@@ -13,7 +13,7 @@ import constants.Constants;
 import constants.Constants.JsonProjectionType;
 
 public class JsonProjection {
-	@Expose public String type = "projection_obj";
+	@Expose public String type = "PROJECTION_OBJ";
 //	public Boolean need_rename = null;
 //	public String rename = null;
 	@Expose public JsonProjectionType projection_type = null;

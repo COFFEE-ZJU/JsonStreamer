@@ -83,7 +83,7 @@ class IdDealer extends ExpressionDealer{
 	protected IdDealer(JsonExpression expr) {
 		super(expr);
 		if(expr.attribute_source == null) isLeftOrGroupArray = null;
-		else if(expr.attribute_source == JsonAttrSource.left || expr.attribute_source == JsonAttrSource.group_array)
+		else if(expr.attribute_source == JsonAttrSource.LEFT || expr.attribute_source == JsonAttrSource.GROUP_ARRAY)
 			isLeftOrGroupArray = true;
 		else isLeftOrGroupArray = false;
 	}
@@ -198,7 +198,7 @@ class AggrDealer extends ExpressionDealer{
 		JsonArray array = projDealer.deal(ele, rightEle).jsonElement.getAsJsonArray();
 		int size = array.size();
 		JsonPrimitive jp;
-		if(expression.aggregate_operation == AggrFuncNames.count) 
+		if(expression.aggregate_operation == AggrFuncNames.COUNT) 
 			jp = new JsonPrimitive(size);
 		else{
 			Iterator<JsonElement> it = array.iterator();
@@ -206,7 +206,7 @@ class AggrDealer extends ExpressionDealer{
 			while(it.hasNext())
 				sum += it.next().getAsDouble();
 			
-			if(expression.aggregate_operation == AggrFuncNames.sum)
+			if(expression.aggregate_operation == AggrFuncNames.SUM)
 				jp = new JsonPrimitive(sum);
 			else jp = new JsonPrimitive(sum/size);
 		}

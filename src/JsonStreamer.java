@@ -57,6 +57,7 @@ public class JsonStreamer extends StoppableThread{
 		SchemaServer.getInstance().stopTheThread();
 		Scheduler.getInstance().stopTheThread();
 		threadPool.awaitTermination(1, TimeUnit.SECONDS);
+		threadPool.shutdown();
 		System.out.println("JsonStreamer stops serving");
 	}
 

@@ -32,9 +32,10 @@ public class Scheduler extends StoppableThread{
 
 	@Override
 	protected void inLoop() throws Exception {
-		if(scheduler.isEmpty()){
+		if(isEmpty()){
 			try {
-				Thread.sleep(100);
+				System.out.println("scheduler sleeping...");
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -42,7 +43,7 @@ public class Scheduler extends StoppableThread{
 		}
 		
 		try {
-			currentOp = scheduler.getNextOperator();
+			currentOp = getNextOperator();
 			currentOp.execute();
 		} catch (SystemErrorException e) {
 			e.printStackTrace();

@@ -16,6 +16,7 @@ public class SocketStreamOutput implements JStreamOutput{
 	public boolean pushNext(MarkedElement ele) {
 		try {
 			out.write(ele.element.jsonElement.toString().getBytes());
+			out.write("\n".getBytes());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

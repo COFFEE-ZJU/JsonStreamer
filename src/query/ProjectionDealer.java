@@ -26,11 +26,11 @@ public abstract class ProjectionDealer {
 	
 	public static ProjectionDealer genProjectionDealer(JsonProjection proj){
 		switch (proj.projection_type) {
-		case array:
+		case ARRAY:
 			return new ArrayDealer(proj);
-		case direct:
+		case DIRECT:
 			return new DirectDealer(proj);
-		case object:
+		case OBJECT:
 			return new ObjectDealer(proj);
 		}
 		return null;

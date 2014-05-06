@@ -1,8 +1,10 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,7 +17,7 @@ import scheduler.Scheduler;
 import utils.UserInfo;
 import IO.JStreamOutput;
 import IO.SocketStreamOutput;
-import constants.Constants;
+import constants.Constants.ConnectionCmds;
 import constants.JsonStreamerException;
 
 
@@ -35,7 +37,7 @@ public class JsonStreamerThread implements Runnable{
 		String api = QueryParser.parseToAPI(query);
 		List<Operator> opList = new APIParser().parse(api, output);
 		
-		outputStream.write("Query Registered!".getBytes());
+		outputStream.write("Query Registered!\r\n".getBytes());
 		Scheduler.getInstance().addOperators(opList);
 		allOperators.addAll(opList);
 		
@@ -49,6 +51,7 @@ public class JsonStreamerThread implements Runnable{
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String line;
 			OutputStream out = socket.getOutputStream();
+//			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(out));
 			State state = State.USER;
 			String userName = null, password;
 			StringBuffer queryBuffer = null;
@@ -61,26 +64,26 @@ public class JsonStreamerThread implements Runnable{
 					out.write("Connection failed!\r\n".getBytes());
 					break;
 				}
-				
+				else if(line.equals("")) continue;
 				switch (state) {
 				case USER:
-					if(!line.startsWith(Constants.USER_PREFIX)){
+					if(!line.startsWith(ConnectionCmds.USER_PREFIX)){
 						inProcess = false;
 						out.write("Expecting User Name\r\n".getBytes());
 					}
 					else{
-						userName = line.substring(Constants.USER_PREFIX.length());
+						userName = line.substring(ConnectionCmds.USER_PREFIX.length());
 						state = State.PW;
 					}
 					break;
 					
 				case PW:
-					if(!line.startsWith(Constants.PW_PREFIX)){
+					if(!line.startsWith(ConnectionCmds.PW_PREFIX)){
 						inProcess = false;
 						out.write("Expecting Password\r\n".getBytes());
 					}
 					else{
-						password = line.substring(Constants.PW_PREFIX.length());
+						password = line.substring(ConnectionCmds.PW_PREFIX.length());
 						if(UserInfo.getInstance().verify(userName, password)){
 							out.write("Verification Succeeded\r\n".getBytes());
 							state = State.VERIFIED;
@@ -93,40 +96,40 @@ public class JsonStreamerThread implements Runnable{
 					break;
 					
 				case VERIFIED:
-					if(line.startsWith(Constants.QUERY_START)){
+					if(line.startsWith(ConnectionCmds.QUERY_START)){
 						queryBuffer = new StringBuffer();
 						state = State.IN_QUERY;
 					}
-					else if(line.startsWith(Constants.QUIT)){
-						if(! allOperators.isEmpty()){
-							if(! Scheduler.getInstance().removeOperators(allOperators))
-								throw new RuntimeException("something wrong!!!");
-						}
-						out.write("Bye!".getBytes());
+					else if(line.startsWith(ConnectionCmds.QUIT)){
+						out.write("Bye!\r\n".getBytes());
 						inProcess = false;
 					}
 					else{
 						inProcess = false;
+						System.err.println(line);
 						out.write("Wrong Command\r\n".getBytes());
 					}
 					break;
 					
 				case IN_QUERY:
-					if(line.startsWith(Constants.QUERY_PREFIX)){
-						queryBuffer.append(line.substring(Constants.QUERY_PREFIX.length()));
+					if(line.startsWith(ConnectionCmds.QUERY_PREFIX)){
+						queryBuffer.append(line.substring(ConnectionCmds.QUERY_PREFIX.length()));
 						queryBuffer.append("\r\n");
 					}
-					else if(line.startsWith(Constants.QUERY_END)){
+					else if(line.startsWith(ConnectionCmds.QUERY_END)){
 						String query = queryBuffer.toString();
 						try{
 							registerQueryFromSocket(query, out);
 						} catch (JsonStreamerException e){
+							inProcess = false;
+							e.printStackTrace();
 							out.write((e.getClass().toString()+": "+e.getMessage()+"\r\n").getBytes());
 						}
 						state = State.VERIFIED;
 					}
 					else{
 						inProcess = false;
+						System.err.println(line);
 						out.write("Wrong Command\r\n".getBytes());
 					}
 					break;
@@ -134,12 +137,16 @@ public class JsonStreamerThread implements Runnable{
 				}
 			}
 			
+			if(! allOperators.isEmpty()){
+				if(! Scheduler.getInstance().removeOperators(allOperators))
+					throw new RuntimeException("something wrong!!!");
+			}
 			out.flush();
 	        out.close();
 	        in.close();
 	        socket.close();
 	        
-//	        System.out.println("query excuted, thread "+threadNo+" ended");
+	        System.out.println("query excuted, thread "+threadNo+" ended");
 //	        synchronized ((Object)threadNum) {
 //				threadNum --;
 //			}

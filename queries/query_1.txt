@@ -1,5 +1,10 @@
-streamT = readFromWrapper ("wrapper_1", true) ;
+USER:user
+PW:123123
+QUERY_START
 
-tmpv = streamT -> window[range now];
+QUERY:streamT = readFromWrapper ("wrapper_1", true) ;
 
-tmpv -> filter $.salary > 500000 -> istream;
+QUERY:tmpv = streamT -> window[range now];
+
+QUERY:tmpv -> filter $.salary > 500000 -> istream;
+QUERY_END

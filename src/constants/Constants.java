@@ -12,12 +12,14 @@ public class Constants {
 	public static final int THREAD_POOL_NUM = 20;
 	public static final int INPUT_STREAM_LENGTH = 1024;
 	public static final int SERVER_ACCEPT_TIMEOUT = 1000;
-	public static String USER_PREFIX = "USER:";
-	public static String PW_PREFIX = "PW:";
-	public static String QUERY_START = "QUERY_START";
-	public static String QUERY_PREFIX = "QUERY:";
-	public static String QUERY_END = "QUERY_END";
-	public static String QUIT = "QUIT";
+	public static class ConnectionCmds{
+		public static final String USER_PREFIX = "USER:";
+		public static final String PW_PREFIX = "PW:";
+		public static final String QUERY_START = "QUERY_START";
+		public static final String QUERY_PREFIX = "QUERY:";
+		public static final String QUERY_END = "QUERY_END";
+		public static final String QUIT = "QUIT";
+	}
 	
 	public static enum OperatorState {READY, SUSPEND};
 	
@@ -30,10 +32,10 @@ public class Constants {
 	public static enum ErrorType {SEMANTIC_ERROR, SYNTAX_ERROR, SYSTEM_ERROR};
 	
 	public static Gson gson = new Gson();
-	public static String QUERY_FILE_PATH = "queries/";
-	public static String SCHEMA_FILE_PATH = "schemas/";
-	public static String WRAPPER_FILE_PATH = "wrappers/";
-	public static String RESULT_FILE_PATH = "resultFiles/";
+	public static final String QUERY_FILE_PATH = "queries/";
+	public static final String SCHEMA_FILE_PATH = "schemas/";
+	public static final String WRAPPER_FILE_PATH = "wrappers/";
+	public static final String RESULT_FILE_PATH = "resultFiles/";
 	public static class WindowUnit {
 		public static final String NOW = "now";
 		public static final String UNBOUNDED = "unbounded";
@@ -43,45 +45,45 @@ public class Constants {
 		public static final String DAYS = "days";
 	}
 	
-	public static class JsonConditionType {	//and, or, not, gt, ge, lt, le, eq, ne, bool
-		public static final String AND = "and";
-		public static final String OR = "or";
-		public static final String NOT = "not";
-		public static final String GT = "gt";
-		public static final String GE = "ge";
-		public static final String LT = "lt";
-		public static final String LE = "le";
-		public static final String EQ = "eq";
-		public static final String NE = "ne";
-		public static final String BOOL = "bool";
-	}
+//	public static class JsonConditionType {	//and, or, not, gt, ge, lt, le, eq, ne, bool
+//		public static final String AND = "and";
+//		public static final String OR = "or";
+//		public static final String NOT = "not";
+//		public static final String GT = "gt";
+//		public static final String GE = "ge";
+//		public static final String LT = "lt";
+//		public static final String LE = "le";
+//		public static final String EQ = "eq";
+//		public static final String NE = "ne";
+//		public static final String BOOL = "bool";
+//	}
 	
 	public static enum JsonValueType{ARRAY, BOOLEAN, INTEGER, NUMBER, NULL, OBJECT, STRING};
-	public static enum JsonProjectionType{object, array, direct};
-	public static enum JsonAttrSource{left, right, group_key_var, group_array};
-	public static enum AggrFuncNames{sum, average, count};
+	public static enum JsonProjectionType{OBJECT, ARRAY, DIRECT};
+	public static enum JsonAttrSource{LEFT, RIGHT, GROUP_KEY_VAR, GROUP_ARRAY};
+	public static enum AggrFuncNames{SUM, AVERAGE, COUNT};
 	
 	public static enum DataType {STREAM,RELATION};
 	public static enum OperationType {JOIN, FILTER, TRANS, GROUP, STREAM, WINDOW, EXPAND, NULL};
 	public static enum JsonOpType{
-		root, error, 
-		projection, leaf, join, groupby_aggregation, selection, expand, 
-		rangewindow, rowwindow, partitionwindow,
-		istream, rstream, dstream
+		ROOT, ERROR, 
+		PROJECTION, LEAF, JOIN, GROUPBY_AGGREGATION, SELECTION, EXPAND, 
+		RANGEWINDOW, ROWWINDOW, PARTITIONWINDOW,
+		ISTREAM, RSTREAM, DSTREAM
 		};
 	
-	public static String LT = "<";
-	public static String LE = "<=";
-	public static String EQ = "==";
-	public static String GE = ">=";
-	public static String GT = ">";
-	public static String NE = "!=";
+	public static final String LT = "<";
+	public static final String LE = "<=";
+	public static final String EQ = "==";
+	public static final String GE = ">=";
+	public static final String GT = ">";
+	public static final String NE = "!=";
 	
 	public static boolean isStreamType(JsonOpType type){
-		if(type == Constants.JsonOpType.leaf ||
-    			type == Constants.JsonOpType.istream ||
-    			type == Constants.JsonOpType.rstream ||
-    			type == Constants.JsonOpType.dstream)
+		if(type == Constants.JsonOpType.LEAF ||
+    			type == Constants.JsonOpType.ISTREAM ||
+    			type == Constants.JsonOpType.RSTREAM ||
+    			type == Constants.JsonOpType.DSTREAM)
 			return true;
 		else
 			return false;

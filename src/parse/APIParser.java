@@ -43,68 +43,68 @@ public class APIParser {
 		Operator retOp = null, subOp = null, subOp2 = null;
 		
 		switch (tree.type) {
-		case root:
+		case ROOT:
 			retOp = new RootOperator(tree, outStream);
 			subOp = parse(tree.input);
 			connectOperators(retOp, subOp);
 			break;
-		case leaf:
+		case LEAF:
 			retOp = new LeafOperator(tree);
 			break;
-		case rowwindow:
+		case ROWWINDOW:
 			retOp = new RowWindowOperator(tree);
 			subOp = parse(tree.input);
 			connectOperators(retOp, subOp);
 			break;
-		case rangewindow:
+		case RANGEWINDOW:
 			retOp = new RangeWindowOperator(tree);
 			subOp = parse(tree.input);
 			connectOperators(retOp, subOp);
 			break;
-		case dstream:
+		case DSTREAM:
 			retOp = new DStreamOperator(tree);
 			subOp = parse(tree.input);
 			connectOperators(retOp, subOp);
 			break;
-		case rstream:
+		case RSTREAM:
 			retOp = new RStreamOperator(tree);
 			subOp = parse(tree.input);
 			connectOperators(retOp, subOp);
 			break;
-		case istream:
+		case ISTREAM:
 			retOp = new IStreamOperator(tree);
 			subOp = parse(tree.input);
 			connectOperators(retOp, subOp);
 			break;
-		case selection:
+		case SELECTION:
 			retOp = new SelectionOperator(tree);
 			subOp = parse(tree.input);
 			connectOperators(retOp, subOp);
 			break;
-		case groupby_aggregation:
+		case GROUPBY_AGGREGATION:
 			retOp = new AggregationOperator(tree);
 			subOp = parse(tree.input);
 			connectOperators(retOp, subOp);
 			break;
-		case expand:
+		case EXPAND:
 			retOp = new ExpandOperator(tree);
 			subOp = parse(tree.input);
 			connectOperators(retOp, subOp);
 			break;
-		case projection:
+		case PROJECTION:
 			retOp = new ProjectionOperator(tree);
 			subOp = parse(tree.input);
 			connectOperators(retOp, subOp);
 			break;
-		case join:
+		case JOIN:
 			retOp = new JoinOperator(tree);
 			subOp = parse(tree.left_input);
 			subOp2 = parse(tree.right_input);
 			connectOperators(retOp, subOp, subOp2);
 			break;
-		case partitionwindow:
+		case PARTITIONWINDOW:
 			throw new SemanticErrorException("partition window not supported yet");
-		case error:
+		case ERROR:
 			JsonError error = tree.error_info;
 			switch (error.error_type) {
 			case SEMANTIC_ERROR:
