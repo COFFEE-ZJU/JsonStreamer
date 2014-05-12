@@ -1,0 +1,4 @@
+{
+	"implement_class": "EmployeeSalaryInput",
+	"schema_name": "employee_schema"
+}

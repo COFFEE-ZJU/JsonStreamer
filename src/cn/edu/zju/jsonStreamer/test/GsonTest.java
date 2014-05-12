@@ -85,6 +85,7 @@ public class GsonTest {
 		}
 	}
 	class Eq2{
+		
 		String str;
 		int id;
 		public Eq2(int id, String str){
@@ -113,7 +114,7 @@ public class GsonTest {
 		mapper.put(ele1, 1);
 		mapper.put(ele2, 2);
 		System.out.println(mapper.get(ele1));
-		ele1.getAsJsonObject().add("new", new JsonPrimitive(111));
+//		ele1.getAsJsonObject().add("new", new JsonPrimitive(111));
 		System.out.println(ele1.equals(ele2));
 		System.out.println(ele1.hashCode() + ",  " + ele2.hashCode());
 	}

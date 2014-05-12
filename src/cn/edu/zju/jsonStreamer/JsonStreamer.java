@@ -75,7 +75,7 @@ public class JsonStreamer extends StoppableThread{
 		String cmd;
 		Scanner scanner = new Scanner(System.in);
 		while(true){
-			cmd = scanner.nextLine();
+			cmd = scanner.nextLine().toUpperCase();
 			System.out.println(cmd);
 			if(cmd.equals("QUIT")){
 				JsonStreamer.getInstance().stopTheThread();

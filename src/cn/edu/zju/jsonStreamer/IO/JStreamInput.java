@@ -1,11 +1,12 @@
 package cn.edu.zju.jsonStreamer.IO;
 
+import com.google.gson.JsonElement;
+
 import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
-import cn.edu.zju.jsonStreamer.json.Element;
 
 public interface JStreamInput {
 	//private JsonSchema schema;
-	public Element getNextElement() throws SystemErrorException;
+	public JsonElement getNextElement() throws SystemErrorException;
 	public boolean isEmpty();
 	public void execute();
 }

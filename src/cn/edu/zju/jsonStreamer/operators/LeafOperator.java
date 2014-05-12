@@ -2,6 +2,8 @@ package cn.edu.zju.jsonStreamer.operators;
 
 import java.util.Queue;
 
+import com.google.gson.JsonElement;
+
 import cn.edu.zju.jsonStreamer.IO.IOManager;
 import cn.edu.zju.jsonStreamer.IO.JStreamInput;
 import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
@@ -35,11 +37,13 @@ public class LeafOperator extends Operator{
 			}
 			outputQueue = outputQueueList.get(0);
 		}
+		JsonElement jele;
 		Element ele;
 		while(! inputStream.isEmpty()){
-			ele = inputStream.getNextElement();
-			if(ele == null) return ;
-			if(! JsonSchemaUtils.validate(ele.jsonElement, schema)) continue ;
+			jele = inputStream.getNextElement();
+			if(jele == null) return ;
+			if(! JsonSchemaUtils.validate(jele, schema)) continue ;
+			ele = new Element(jele, schema.getType());
 			outputQueue.add(new MarkedElement(ele, 
 					ElementIdGenerator.getNewId(), 
 					ElementMark.PLUS, 

@@ -35,7 +35,7 @@ public class Scheduler extends StoppableThread{
 		if(isEmpty()){
 			try {
 				System.out.println("scheduler sleeping...");
-				Thread.sleep(1000);
+				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -44,7 +44,7 @@ public class Scheduler extends StoppableThread{
 		
 		try {
 			currentOp = getNextOperator();
-			currentOp.execute();
+			if(currentOp != null) currentOp.execute();
 		} catch (SystemErrorException e) {
 			e.printStackTrace();
 		}
@@ -127,7 +127,7 @@ public class Scheduler extends StoppableThread{
 	private Operator getNextOperator() throws SystemErrorException{
 		synchronized (opList) {
 			if(isEmpty())
-				throw new SystemErrorException("operation list empty");
+				return null;
 			if(iterator.hasNext()) return iterator.next();
 			else{
 				iterator = opList.iterator();

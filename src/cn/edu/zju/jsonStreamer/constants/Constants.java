@@ -101,4 +101,15 @@ public class Constants {
 			put("string",JsonValueType.STRING);
 		}
 	};
+	
+	//for storm
+	public static class StormFields{
+		public static final String markedElement = "marked_element";
+		public static final String timeStamp = "time_stamp";
+		public static final String mark = "mark";
+		public static final String id = "id";
+		public static final String element = "element";
+		public static final String groupKey = "group_key";
+		public static final String sourceId = "source_id";
+	}
 }

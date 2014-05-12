@@ -89,7 +89,7 @@ class IdDealer extends ExpressionDealer{
 
 	@Override
 	public Element deal(Element ele, Element rightEle) {
-		if(isLeftOrGroupArray == null || rightEle == null)		//not in join or groupby
+		if(isLeftOrGroupArray == null)		//not in join or groupby
 			return new Element(getIdValue(expression.id_name.toArray(), 0, ele.jsonElement), expression.retSchema.getType());
 		
 		if(isLeftOrGroupArray == false)		//use left source in join or group array in groupby
