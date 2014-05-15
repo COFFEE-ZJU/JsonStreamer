@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-
 import cn.edu.zju.jsonStreamer.constants.Constants.ElementMark;
 import cn.edu.zju.jsonStreamer.constants.Constants.JsonValueType;
 import cn.edu.zju.jsonStreamer.json.Element;

@@ -4,8 +4,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
 import cn.edu.zju.jsonStreamer.constants.Constants.ElementMark;
+import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
 import cn.edu.zju.jsonStreamer.json.Element;
 import cn.edu.zju.jsonStreamer.json.MarkedElement;
 import cn.edu.zju.jsonStreamer.jsonAPI.JsonQueryTree;

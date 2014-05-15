@@ -2,8 +2,8 @@ package cn.edu.zju.jsonStreamer.operators;
 
 import java.util.Queue;
 
-import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
 import cn.edu.zju.jsonStreamer.constants.Constants.ElementMark;
+import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
 import cn.edu.zju.jsonStreamer.json.MarkedElement;
 import cn.edu.zju.jsonStreamer.jsonAPI.JsonQueryTree;
 

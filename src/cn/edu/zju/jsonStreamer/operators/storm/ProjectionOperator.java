@@ -3,23 +3,30 @@ package cn.edu.zju.jsonStreamer.operators.storm;
 import java.util.HashMap;
 import java.util.Map;
 
+import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Values;
-
 import cn.edu.zju.jsonStreamer.constants.Constants.ElementMark;
 import cn.edu.zju.jsonStreamer.json.Element;
 import cn.edu.zju.jsonStreamer.json.MarkedElement;
+import cn.edu.zju.jsonStreamer.jsonAPI.JsonProjection;
 import cn.edu.zju.jsonStreamer.jsonAPI.JsonQueryTree;
 import cn.edu.zju.jsonStreamer.query.ProjectionDealer;
 import cn.edu.zju.jsonStreamer.utils.ElementIdGenerator;
 
 
 public class ProjectionOperator extends OperatorOneInOneOut{
-	private final ProjectionDealer projDealer;
+	private ProjectionDealer projDealer;
+	private final JsonProjection proj;
 //	private final Map<Long, Element> synopsis;
-	private final Map<Long, Long> relatedMap;
+	private Map<Long, Long> relatedMap;
 	public ProjectionOperator(JsonQueryTree tree) {
 		super(tree);
-		projDealer = ProjectionDealer.genProjectionDealer(tree.projection);
+		proj = tree.projection;
+	}
+	
+	@Override
+    public void prepare(Map stormConf, TopologyContext context) {
+		projDealer = ProjectionDealer.genProjectionDealer(proj);
 //		synopsis = new HashMap<Long, Element>();
 		relatedMap = new HashMap<Long, Long>();
 	}

@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-
 import cn.edu.zju.jsonStreamer.constants.Constants.ElementMark;
 import cn.edu.zju.jsonStreamer.json.Element;
 import cn.edu.zju.jsonStreamer.json.MarkedElement;

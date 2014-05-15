@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.List;
 
-
 import cn.edu.zju.jsonStreamer.json.JsonSchema;
 import cn.edu.zju.jsonStreamer.jsonAPI.JsonQueryTree;
 

@@ -1,4 +1,4 @@
-package cn.edu.zju.jsonStreamer.IO;
+package cn.edu.zju.jsonStreamer.IO.output;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -14,9 +14,9 @@ public class SocketStreamOutput implements JStreamOutput{
 	}
 	
 	@Override
-	public boolean pushNext(MarkedElement ele) {
+	public boolean pushNext(String ele) {
 		try {
-			out.write(ele.element.jsonElement.toString().getBytes());
+			out.write(ele.getBytes());
 			out.write("\n".getBytes());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

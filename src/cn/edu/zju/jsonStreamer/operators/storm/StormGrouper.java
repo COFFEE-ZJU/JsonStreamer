@@ -3,6 +3,7 @@ package cn.edu.zju.jsonStreamer.operators.storm;
 import java.util.HashMap;
 import java.util.Map;
 
+import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;
@@ -19,14 +20,21 @@ import cn.edu.zju.jsonStreamer.query.ExpressionDealer;
 public class StormGrouper extends BaseBasicBolt{
 	private Map<Long, Element> synopsis;
 	private ExpressionDealer groupKeyDealer;
+	private final JsonExpression keyExpr;
 	private Integer sourceId = null;
+	
 	public StormGrouper(JsonExpression keyExpr){
 		this(keyExpr, null);
 	}
 	public StormGrouper(JsonExpression keyExpr, Integer sourceId){
+		this.keyExpr = keyExpr;
+		this.sourceId = sourceId;
+	}
+
+	@Override
+    public void prepare(Map stormConf, TopologyContext context) {
 		synopsis = new HashMap<Long, Element>();
 		groupKeyDealer = ExpressionDealer.genExpressionDealer(keyExpr);
-		this.sourceId = sourceId;
 	}
 
 	@Override

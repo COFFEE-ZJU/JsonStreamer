@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-
 import cn.edu.zju.jsonStreamer.constants.Constants;
 import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
 import cn.edu.zju.jsonStreamer.json.JsonSchema;

@@ -1,16 +1,29 @@
-package cn.edu.zju.jsonStreamer.operators;
+package cn.edu.zju.jsonStreamer.operators.storm;
 
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
+
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.BasicOutputCollector;
+import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 import cn.edu.zju.jsonStreamer.constants.Constants;
 import cn.edu.zju.jsonStreamer.constants.Constants.ElementMark;
+import cn.edu.zju.jsonStreamer.constants.Constants.StormFields;
 import cn.edu.zju.jsonStreamer.constants.Constants.WindowUnit;
 import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
 import cn.edu.zju.jsonStreamer.json.MarkedElement;
 import cn.edu.zju.jsonStreamer.jsonAPI.JsonQueryTree;
 
-public class RangeWindowOperator extends OperatorStreamToRelation{
+public class RangeWindowOperator extends Operator{
 	private final long timeRange;		//time unit: millisecond  0 for now; -1 for unbounded
+	private Queue<Long> synopsis;
+	private Queue<Long> timeSynopsis;
+	
 	public RangeWindowOperator(JsonQueryTree tree) throws SystemErrorException{
 		super(tree);
+		
 		String time = (String)tree.windowsize;
 		String[] times = time.split(" ");
 		if(times.length == 1){
@@ -56,22 +69,32 @@ public class RangeWindowOperator extends OperatorStreamToRelation{
 	}
 
 	@Override
-	protected void process(MarkedElement markedElement) {
+    public void prepare(Map stormConf, TopologyContext context) {
+		synopsis = new LinkedList<Long>();
+		timeSynopsis = new LinkedList<Long>();
+	}
+
+	@Override
+	public void execute(Tuple input, BasicOutputCollector collector) {
+		MarkedElement me = (MarkedElement)input.getValueByField(StormFields.markedElement);
+		if(me.mark == ElementMark.MINUS) throw new RuntimeException("stream element can't be MINUS marked");
 		if(timeRange != -1){
-			long cutTime = markedElement.timeStamp - timeRange;
-			MarkedElement me;
+			long cutTime = me.timeStamp - timeRange;
+			long eleIdToDelete;
+			long timeStamp;
 			while(! synopsis.isEmpty()){
-				me = synopsis.peek();
-				if(me.timeStamp <= cutTime){
-					synopsis.poll();
-					outputQueue.add(new MarkedElement(me.element, me.id, ElementMark.MINUS, markedElement.timeStamp));
+				timeStamp = timeSynopsis.peek();
+				if(timeStamp <= cutTime){
+					eleIdToDelete = synopsis.poll();
+					timeSynopsis.poll();
+					collector.emit(new Values(eleIdToDelete, 
+							new MarkedElement(null, eleIdToDelete, ElementMark.MINUS, me.timeStamp)));
 				}
 				else break;
 			}
 		}
-		
-		synopsis.add(markedElement);
-		outputQueue.add(markedElement);
+		synopsis.add(me.id);
+		timeSynopsis.add(me.timeStamp);
+		collector.emit(input.getValues());
 	}
-
 }

@@ -2,7 +2,8 @@ package cn.edu.zju.jsonStreamer.operators;
 
 import java.util.Queue;
 
-import cn.edu.zju.jsonStreamer.IO.JStreamOutput;
+import cn.edu.zju.jsonStreamer.IO.output.JStreamOutput;
+import cn.edu.zju.jsonStreamer.constants.Constants;
 import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
 import cn.edu.zju.jsonStreamer.json.MarkedElement;
 import cn.edu.zju.jsonStreamer.jsonAPI.JsonQueryTree;
@@ -25,7 +26,7 @@ public class RootOperator extends Operator{
 			inputQueue = inputQueueList.get(0);
 		}
 		while(! inputQueue.isEmpty()){
-			outputStream.pushNext(inputQueue.poll());
+			outputStream.pushNext(Constants.gson.toJson(inputQueue.poll().element.jsonElement));
 		}
 	}
 

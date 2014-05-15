@@ -1,4 +1,4 @@
-package cn.edu.zju.jsonStreamer.IO;
+package cn.edu.zju.jsonStreamer.IO.output;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,17 +16,17 @@ import cn.edu.zju.jsonStreamer.json.MarkedElement;
 public class FileStreamOutput implements JStreamOutput{
 	private boolean started = false;
 	private String fileName;
-	private Queue<Element> queue = new LinkedList<Element>();
+	private Queue<String> queue = new LinkedList<String>();
 	
 	public FileStreamOutput(String fileName){
 		this.fileName = fileName;
 	}
 	
 	@Override
-	public boolean pushNext(MarkedElement ele) throws SystemErrorException{
-		if(ele.element == null) throw new SystemErrorException("null found");
+	public boolean pushNext(String ele) throws SystemErrorException{
+		if(ele == null) throw new SystemErrorException("null found");
 		synchronized (queue) {
-			queue.add(ele.element);
+			queue.add(ele);
 		}
 		return true;
 	}
@@ -52,9 +52,9 @@ public class FileStreamOutput implements JStreamOutput{
 				while(true){
 					synchronized (queue) {
 						if(queue.isEmpty()) continue;
-						Element ele = queue.poll();
+						String ele = queue.poll();
 						if(ele == null) throw new SystemErrorException("null found");
-						ps.append(ele.toString()+"\r\n");
+						ps.append(ele+"\r\n");
 					}
 				}
 			} catch (FileNotFoundException | SystemErrorException e) {

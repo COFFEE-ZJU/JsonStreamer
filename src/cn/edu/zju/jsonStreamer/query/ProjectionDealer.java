@@ -7,14 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-
 import cn.edu.zju.jsonStreamer.json.Element;
 import cn.edu.zju.jsonStreamer.jsonAPI.JsonProjection;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-public abstract class ProjectionDealer {
+public abstract class ProjectionDealer{
 	protected final JsonProjection projection;
 	protected ProjectionDealer(JsonProjection proj){
 		projection = proj;

@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.lang.reflect.Constructor;
 
-import cn.edu.zju.jsonStreamer.IO.JStreamInput;
-import cn.edu.zju.jsonStreamer.IO.TestStreamInput;
+import cn.edu.zju.jsonStreamer.IO.input.JStreamInput;
+import cn.edu.zju.jsonStreamer.IO.input.TestStreamInput;
 import cn.edu.zju.jsonStreamer.constants.Constants;
 import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
 import cn.edu.zju.jsonStreamer.json.JsonSchema;

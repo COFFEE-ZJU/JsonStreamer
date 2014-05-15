@@ -5,8 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-
-import cn.edu.zju.jsonStreamer.IO.JStreamOutput;
+import cn.edu.zju.jsonStreamer.IO.output.JStreamOutput;
 import cn.edu.zju.jsonStreamer.constants.JsonStreamerException;
 import cn.edu.zju.jsonStreamer.constants.SemanticErrorException;
 import cn.edu.zju.jsonStreamer.constants.SyntaxErrorException;
@@ -31,8 +30,7 @@ import cn.edu.zju.jsonStreamer.operators.SelectionOperator;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-
-public class APIParser {
+public class APIParserForLocal {
 	private JStreamOutput outStream;
 	private List<Operator> opList;
 	

@@ -7,7 +7,6 @@ import java.util.Map;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
-import com.google.gson.JsonPrimitive;
 import com.google.gson.internal.LinkedTreeMap;
 
 public class GsonTest {

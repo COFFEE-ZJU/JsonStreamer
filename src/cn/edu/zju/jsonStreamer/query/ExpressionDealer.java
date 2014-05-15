@@ -3,7 +3,6 @@ package cn.edu.zju.jsonStreamer.query;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-
 import cn.edu.zju.jsonStreamer.constants.Constants.AggrFuncNames;
 import cn.edu.zju.jsonStreamer.constants.Constants.JsonAttrSource;
 import cn.edu.zju.jsonStreamer.constants.Constants.JsonValueType;

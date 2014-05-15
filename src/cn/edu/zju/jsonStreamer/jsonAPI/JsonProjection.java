@@ -3,7 +3,6 @@ package cn.edu.zju.jsonStreamer.jsonAPI;
 import java.util.List;
 import java.util.Map;
 
-
 import cn.edu.zju.jsonStreamer.constants.Constants;
 import cn.edu.zju.jsonStreamer.constants.Constants.JsonProjectionType;
 import cn.edu.zju.jsonStreamer.json.JsonSchema;

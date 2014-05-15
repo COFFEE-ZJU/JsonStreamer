@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
@@ -13,6 +14,7 @@ import cn.edu.zju.jsonStreamer.constants.Constants.ElementMark;
 import cn.edu.zju.jsonStreamer.constants.Constants.StormFields;
 import cn.edu.zju.jsonStreamer.json.Element;
 import cn.edu.zju.jsonStreamer.json.MarkedElement;
+import cn.edu.zju.jsonStreamer.jsonAPI.JsonProjection;
 import cn.edu.zju.jsonStreamer.jsonAPI.JsonQueryTree;
 import cn.edu.zju.jsonStreamer.query.ProjectionDealer;
 import cn.edu.zju.jsonStreamer.utils.ElementIdGenerator;
@@ -22,19 +24,26 @@ public class JoinOperator extends Operator{
 	private static enum Source {LEFT, RIGHT};
 	private BasicOutputCollector curCollector;
 	
-	private final Map<Integer, Set<Long> > leftGroupKeyMap, rightGroupKeyMap;
+	private Map<Integer, Set<Long> > leftGroupKeyMap, rightGroupKeyMap;
 	private final boolean leftOutter, rightOutter;
-	private final Map<Long, Set<Long> > leftRelatedMapper, rightRelatedMapper;	
+	private Map<Long, Set<Long> > leftRelatedMapper, rightRelatedMapper;	
 	//map to those elements which are related to the input element
-	private final Map<Long, Element> leftElements, rightElements;
-	private final Set<Long> synopsis;
+	private Map<Long, Element> leftElements, rightElements;
+	private Set<Long> synopsis;
 //	private final JoinEqDealer eqDealer;
-	private final ProjectionDealer projDealer;
+	private ProjectionDealer projDealer;
+	private final JsonProjection proj;
 	
 //	private Queue<MarkedElement> leftInputQueue = null, rightInputQueue = null;
 //	private Queue<MarkedElement> outputQueue = null;
 	public JoinOperator(JsonQueryTree tree) {
 		super(tree);
+		leftOutter = rightOutter = false; 	//TODO
+		proj = tree.projection;
+	}
+	
+	@Override
+    public void prepare(Map stormConf, TopologyContext context) {
 		leftGroupKeyMap = new HashMap<Integer, Set<Long>>();
 		rightGroupKeyMap = new HashMap<Integer, Set<Long>>();
 		
@@ -43,11 +52,8 @@ public class JoinOperator extends Operator{
 		synopsis = new HashSet<Long>();
 		leftElements = new HashMap<Long, Element>();
 		rightElements = new HashMap<Long, Element>();
-		
-		leftOutter = rightOutter = false; 	//TODO
-		
 //		eqDealer = new JoinEqDealer(tree.left_join_attribute, tree.right_join_attribute);
-		projDealer = ProjectionDealer.genProjectionDealer(tree.projection);
+		projDealer = ProjectionDealer.genProjectionDealer(proj);
 	}
 	
 	private void processPlus(Element keyEle, MarkedElement markedElement, Source source){
@@ -96,7 +102,7 @@ public class JoinOperator extends Operator{
 				newId = ElementIdGenerator.getNewId();
 				set.add(newId);
 				synopsis.add(newId);
-				curCollector.emit(new Values(
+				curCollector.emit(new Values(newId, 
 						new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp)));
 			}
 			mapper.put(id, set);
@@ -160,7 +166,7 @@ public class JoinOperator extends Operator{
 //			eleToDelete = synopsis.get(eleIdToDelete);
 			synopsis.remove(eleIdToDelete);
 			
-			curCollector.emit(new Values(
+			curCollector.emit(new Values(eleIdToDelete, 
 					new MarkedElement(null, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp)));
 //			outputQueue.add(new MarkedElement(eleToDelete, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp));
 		}

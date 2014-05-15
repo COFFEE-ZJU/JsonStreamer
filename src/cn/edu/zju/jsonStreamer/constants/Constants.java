@@ -1,11 +1,16 @@
 package cn.edu.zju.jsonStreamer.constants;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gson.Gson;
 
 public class Constants {
+	public static enum ExecutionMode{LOCAL, STORM};
+	public static final ExecutionMode EXECUTION_MODE = ExecutionMode.LOCAL;
+	
 	public static final int COMPILER_PORT = 3000;
 	public static final int SCHEMA_SERVER_PORT = 2048;
 	public static final int LISTEN_PORT = 2703;
@@ -112,4 +117,19 @@ public class Constants {
 		public static final String groupKey = "group_key";
 		public static final String sourceId = "source_id";
 	}
+	public static final String stormJedisSendQueue = "JsonStreamer_send_";
+	public static final String stormJedisReceiveQueue = "JsonStreamer_receive_";
+	
+	private static String myIp = null;
+	public static String getMyIp() throws SystemErrorException{
+		if(myIp != null) return myIp;
+		InetAddress addr = null;
+		try {
+			addr = InetAddress.getLocalHost();
+			myIp = addr.getHostAddress().toString();
+			return myIp;
+		} catch (UnknownHostException e) {
+			throw new SystemErrorException(e);
+		}
+	};
 }

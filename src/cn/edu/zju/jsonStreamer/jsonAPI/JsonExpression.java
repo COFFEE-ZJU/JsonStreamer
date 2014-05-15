@@ -2,12 +2,11 @@ package cn.edu.zju.jsonStreamer.jsonAPI;
 
 import java.util.List;
 
-
 import cn.edu.zju.jsonStreamer.constants.Constants;
-import cn.edu.zju.jsonStreamer.constants.SemanticErrorException;
 import cn.edu.zju.jsonStreamer.constants.Constants.AggrFuncNames;
 import cn.edu.zju.jsonStreamer.constants.Constants.JsonAttrSource;
 import cn.edu.zju.jsonStreamer.constants.Constants.JsonExprType;
+import cn.edu.zju.jsonStreamer.constants.SemanticErrorException;
 import cn.edu.zju.jsonStreamer.json.JsonSchema;
 
 import com.google.gson.annotations.Expose;

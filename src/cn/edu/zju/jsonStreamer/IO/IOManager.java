@@ -3,6 +3,8 @@ package cn.edu.zju.jsonStreamer.IO;
 import java.util.HashMap;
 import java.util.Map;
 
+import cn.edu.zju.jsonStreamer.IO.input.JStreamInput;
+import cn.edu.zju.jsonStreamer.IO.output.JStreamOutput;
 import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
 import cn.edu.zju.jsonStreamer.wrapper.WrapperManager;
 

@@ -9,12 +9,12 @@ import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
 
-import cn.edu.zju.jsonStreamer.IO.JStreamOutput;
-import cn.edu.zju.jsonStreamer.IO.SocketStreamOutput;
-import cn.edu.zju.jsonStreamer.constants.JsonStreamerException;
+import cn.edu.zju.jsonStreamer.IO.output.JStreamOutput;
+import cn.edu.zju.jsonStreamer.IO.output.SocketStreamOutput;
 import cn.edu.zju.jsonStreamer.constants.Constants.ConnectionCmds;
+import cn.edu.zju.jsonStreamer.constants.JsonStreamerException;
 import cn.edu.zju.jsonStreamer.operators.Operator;
-import cn.edu.zju.jsonStreamer.parse.APIParser;
+import cn.edu.zju.jsonStreamer.parse.APIParserForLocal;
 import cn.edu.zju.jsonStreamer.parse.QueryParser;
 import cn.edu.zju.jsonStreamer.scheduler.Scheduler;
 import cn.edu.zju.jsonStreamer.utils.UserInfo;
@@ -34,7 +34,7 @@ public class JsonStreamerThread implements Runnable{
 	private void registerQueryFromSocket(String query, OutputStream outputStream) throws JsonStreamerException, IOException{
 		JStreamOutput output = new SocketStreamOutput(outputStream);
 		String api = QueryParser.parseToAPI(query);
-		List<Operator> opList = new APIParser().parse(api, output);
+		List<Operator> opList = new APIParserForLocal().parse(api, output);
 		
 		outputStream.write("Query Registered!\r\n".getBytes());
 		Scheduler.getInstance().addOperators(opList);

@@ -1,18 +1,20 @@
 package cn.edu.zju.jsonStreamer.operators.storm;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
-
+import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Values;
 import cn.edu.zju.jsonStreamer.constants.Constants.ElementMark;
 import cn.edu.zju.jsonStreamer.constants.Constants.JsonValueType;
 import cn.edu.zju.jsonStreamer.constants.Constants.StormFields;
 import cn.edu.zju.jsonStreamer.json.Element;
 import cn.edu.zju.jsonStreamer.json.MarkedElement;
+import cn.edu.zju.jsonStreamer.jsonAPI.JsonProjection;
 import cn.edu.zju.jsonStreamer.jsonAPI.JsonQueryTree;
-import cn.edu.zju.jsonStreamer.query.ExpressionDealer;
+import cn.edu.zju.jsonStreamer.query.ConditionDealer;
 import cn.edu.zju.jsonStreamer.query.ProjectionDealer;
 import cn.edu.zju.jsonStreamer.utils.ElementIdGenerator;
 
@@ -21,22 +23,29 @@ import com.google.gson.JsonElement;
 
 
 public class AggregationOperator extends OperatorOneInOneOut{
-	private final Map<Integer, JsonArray> groupMap;		//groupKey's hashCode to the Element array
+	private Map<Integer, JsonArray> groupMap;		//groupKey's hashCode to the Element array
 //	private final Map<Long, Element> synopsis;			//output Element Id to the Element
-	private final Map<Integer, Long> relatedMap;		//groupKey's hashCode to output Element Id
+	private Map<Integer, Long> relatedMap;		//groupKey's hashCode to output Element Id
 //	private final Map<Long, Integer> idToGroupKey;		//input Element Id to groupKey's hashCode
-	private final ProjectionDealer projDealer;
+	private ProjectionDealer projDealer;
+	private final JsonProjection proj;
 //	private final ExpressionDealer groupAttrDealer;
 	
 	public AggregationOperator(JsonQueryTree tree) {
 		super(tree);
+		proj = tree.projection;
+		
+	}
+	
+	@Override
+    public void prepare(Map stormConf, TopologyContext context) {
 		groupMap = new HashMap<Integer, JsonArray>();
-		projDealer = ProjectionDealer.genProjectionDealer(tree.projection);
+		projDealer = ProjectionDealer.genProjectionDealer(proj);
 //		groupAttrDealer = ExpressionDealer.genExpressionDealer(tree.groupby_attribute_name);
 //		synopsis = new HashMap<Long, Element>();
 		relatedMap = new HashMap<Integer, Long>();
 //		idToGroupKey = new HashMap<Long, Integer>();
-	}
+    }
 	
 	@Override
 	protected void processPlus(MarkedElement markedElement){

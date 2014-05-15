@@ -1,4 +1,4 @@
-package cn.edu.zju.jsonStreamer.IO;
+package cn.edu.zju.jsonStreamer.IO.input;
 
 import java.io.BufferedWriter;
 import java.io.File;

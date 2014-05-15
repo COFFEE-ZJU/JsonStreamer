@@ -1,25 +1,25 @@
-package cn.edu.zju.jsonStreamer.IO;
+package cn.edu.zju.jsonStreamer.IO.input;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
-import com.google.gson.JsonElement;
-
-import cn.edu.zju.jsonStreamer.json.Element;
+import cn.edu.zju.jsonStreamer.constants.Constants;
 import cn.edu.zju.jsonStreamer.json.JsonSchema;
 import cn.edu.zju.jsonStreamer.utils.RandomJsonGenerator;
+
+import com.google.gson.JsonElement;
 
 
 public class TestStreamInput implements JStreamInput{
 	private boolean started = false;
-	private Queue<JsonElement> queue;
+	private Queue<String> queue;
 	private RandomJsonGenerator generator;
 	public TestStreamInput(JsonSchema schema){
-		queue = new LinkedList<JsonElement>();
+		queue = new LinkedList<String>();
 		generator = new RandomJsonGenerator(schema);
 	}
 	@Override
-	public JsonElement getNextElement() {
+	public String getNextElement() {
 		if(isEmpty()) return null;
 		else{
 			synchronized (queue) {
@@ -43,7 +43,7 @@ public class TestStreamInput implements JStreamInput{
 		public void run(){
 			for(int i=0;i<10;i++){
 				synchronized (queue) {
-					queue.add(generator.generateRandomElement().jsonElement);
+					queue.add(Constants.gson.toJson(generator.generateRandomElement().jsonElement));
 					try {
 						Thread.sleep(RandomJsonGenerator.random.nextInt(100));
 					} catch (InterruptedException e) {

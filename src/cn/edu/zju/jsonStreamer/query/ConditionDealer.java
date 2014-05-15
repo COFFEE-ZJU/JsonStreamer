@@ -8,7 +8,7 @@ import cn.edu.zju.jsonStreamer.jsonAPI.JsonCondition;
 import com.google.gson.JsonPrimitive;
 
 
-public abstract class ConditionDealer {
+public abstract class ConditionDealer{
 	protected final JsonCondition condition;
 	protected ConditionDealer(JsonCondition cond){
 		condition = cond;
