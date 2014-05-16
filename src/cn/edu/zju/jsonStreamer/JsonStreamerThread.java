@@ -42,7 +42,7 @@ public class JsonStreamerThread implements Runnable{
 		else
 			reg = new RegisterForStorm();
 		
-		reg.parse(api, output);
+		reg.register(api, output);
 		
 		outputStream.write("Query Registered!\r\n".getBytes());
 		allQueries.add(reg);

@@ -1,5 +1,6 @@
 package cn.edu.zju.jsonStreamer.parse;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +12,7 @@ import org.apache.thrift7.TException;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
+import backtype.storm.daemon.supervisor;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.generated.KillOptions;
@@ -22,6 +24,7 @@ import backtype.storm.utils.NimbusClient;
 import backtype.storm.utils.Utils;
 import cn.edu.zju.jsonStreamer.IO.output.JStreamOutput;
 import cn.edu.zju.jsonStreamer.constants.Constants;
+import cn.edu.zju.jsonStreamer.constants.Constants.JsonOpType;
 import cn.edu.zju.jsonStreamer.constants.Constants.StormFields;
 import cn.edu.zju.jsonStreamer.constants.JsonStreamerException;
 import cn.edu.zju.jsonStreamer.constants.SemanticErrorException;
@@ -54,11 +57,20 @@ import com.google.gson.reflect.TypeToken;
 public class RegisterForStorm extends Register{
 	private JStreamOutput outStream;
 	private List<Operator> opList = null;
+	private List<Operator> tmpOps = null;
 	private long topologyId;
 	private String ip;
 	private Queue<String> topologies = null;
+	private Map<JsonQueryTree, String> nodeMap = null;
 	private LocalCluster localCluster = null;		//for local mode
 	private TopologyBuilder builder;
+	
+	public RegisterForStorm(){
+		opList = new LinkedList<Operator>();
+		topologies = new LinkedList<String>();
+		nodeMap = new HashMap<JsonQueryTree, String>();
+		if(Constants.STORM_LOCAL) localCluster = new LocalCluster();
+	}
 	
 	@Override
 	public void cancelQuery() throws SystemErrorException{
@@ -84,138 +96,143 @@ public class RegisterForStorm extends Register{
 	}
 	
 	@Override
-	public void parse(String jsonApiString, JStreamOutput outStream) throws JsonStreamerException{
-		if(opList != null || topologies != null) throw new SystemErrorException("double parse for one parser instance");
+	public void register(String jsonApiString, JStreamOutput outStream) throws JsonStreamerException{
+		super.register(jsonApiString, outStream);
+//		if(opList != null || topologies != null) throw new SystemErrorException("double parse for one parser instance");
 		
 		List<JsonQueryTree> jqt = Constants.gson.fromJson(jsonApiString, new TypeToken<List<JsonQueryTree> >(){}.getType());
 		this.outStream = outStream;
-		topologyId = ElementIdGenerator.getNewId();
 		ip = Constants.getMyIp();
-		opList = new LinkedList<Operator>();
-		topologies = new LinkedList<String>();
-		if(Constants.STORM_LOCAL) localCluster = new LocalCluster();
-		
+		topologyId = ElementIdGenerator.getNewId();
+		String topName = "JsonStreamerTopology"+topologyId;
+		tmpOps = new LinkedList<Operator>();
+		builder = new TopologyBuilder();
 		Iterator<JsonQueryTree> it = jqt.iterator();
 		JsonQueryTree curTree;
 		while(it.hasNext()){
-			builder = new TopologyBuilder();
 			curTree = it.next();
-			String topName = parse(curTree);
-			Config conf = new Config();
-			conf.setDebug(true);
-			if(Constants.STORM_LOCAL){
-				localCluster.submitTopology(topName, conf, builder.createTopology());
+			parse(curTree);
+		}
+		Config conf = new Config();
+		conf.setDebug(true);
+		if(Constants.STORM_LOCAL){
+			localCluster.submitTopology(topName, conf, builder.createTopology());
+			topologies.add(topName);
+		}
+		else{
+			try {
+				conf.setNumWorkers(3);
+				StormSubmitter.submitTopology(topName, conf, builder.createTopology());
 				topologies.add(topName);
-			}
-			else{
-				try {
-					conf.setNumWorkers(3);
-					StormSubmitter.submitTopology(topName, conf, builder.createTopology());
-					topologies.add(topName);
-				} catch (AlreadyAliveException | InvalidTopologyException e) {
-					throw new SystemErrorException(e);
-				}
+			} catch (AlreadyAliveException | InvalidTopologyException e) {
+				throw new SystemErrorException(e);
 			}
 		}
-		Scheduler.getInstance().addOperators(opList);
-
+		
+		Scheduler.getInstance().addOperators(tmpOps);
+		opList.addAll(tmpOps);
 	}
 	
-	private String parse(JsonQueryTree tree) throws JsonStreamerException{	//returns operator's className + topologyId
+	private String parse(JsonQueryTree tree) throws JsonStreamerException{	//returns operator's className + unique id
 //		Operator retOp = null, subOp = null, subOp2 = null;
-		String opName, subOpName;
+		String opName = null, subOpName = null;
+		if(tree.type != JsonOpType.ROOT && tree.type != JsonOpType.ERROR){
+			opName = nodeMap.get(tree);
+			if(opName != null) return opName;
+		}
+		
 		switch (tree.type) {
 		case ROOT:
-			StreamReceiver sr = new StreamReceiver(tree, outStream, topologyId);
+			StreamReceiver sr = new StreamReceiver(tree, outStream, ElementIdGenerator.getNewId());
 			RootOperator ro = new RootOperator(ip, sr.getQueueName());
 			subOpName = parse(tree.input);
-			opName = ro.getClass().getSimpleName()+topologyId;
+			opName = ro.getClass().getSimpleName()+ElementIdGenerator.getNewId();
 			builder.setBolt(opName, ro, 1).shuffleGrouping(subOpName);
-			opList.add(sr);
-			return opName;
+			tmpOps.add(sr);
+			break;
 			
 		case LEAF:
-			StreamSender ss = new StreamSender(tree, topologyId);
+			StreamSender ss = new StreamSender(tree, ElementIdGenerator.getNewId());
 			LeafOperator lo = new LeafOperator(tree, ip, ss.getQueueName());
-			opName = lo.getClass().getSimpleName()+topologyId;
+			opName = lo.getClass().getSimpleName()+ElementIdGenerator.getNewId();
 			builder.setSpout(opName, lo, 1);
-			opList.add(ss);
-			return opName;
+			tmpOps.add(ss);
+			break;
 			
 		case ROWWINDOW:
 			RowWindowOperator row = new RowWindowOperator(tree);
-			opName = row.getClass().getSimpleName()+topologyId;
+			opName = row.getClass().getSimpleName()+ElementIdGenerator.getNewId();
 			subOpName = parse(tree.input);
 			builder.setBolt(opName, row, 1).shuffleGrouping(subOpName);
-			return opName;
+			break;
 			
 		case RANGEWINDOW:
 			RangeWindowOperator range = new RangeWindowOperator(tree);
-			opName = range.getClass().getSimpleName()+topologyId;
+			opName = range.getClass().getSimpleName()+ElementIdGenerator.getNewId();
 			subOpName = parse(tree.input);
 			builder.setBolt(opName, range, 1).shuffleGrouping(subOpName);
-			return opName;
+			break;
 			
 		case DSTREAM:
 			DStreamOperator dso = new DStreamOperator(tree);
-			opName = dso.getClass().getSimpleName()+topologyId;
+			opName = dso.getClass().getSimpleName()+ElementIdGenerator.getNewId();
 			subOpName = parse(tree.input);
 			builder.setBolt(opName, dso, 1).shuffleGrouping(subOpName);
-			return opName;
+			break;
 
 		case RSTREAM:
 			RStreamOperator rso = new RStreamOperator(tree);
-			opName = rso.getClass().getSimpleName()+topologyId;
+			opName = rso.getClass().getSimpleName()+ElementIdGenerator.getNewId();
 			subOpName = parse(tree.input);
 			builder.setBolt(opName, rso, 1).shuffleGrouping(subOpName);
-			return opName;
+			break;
 			
 		case ISTREAM:
 			IStreamOperator iso = new IStreamOperator(tree);
-			opName = iso.getClass().getSimpleName()+topologyId;
+			opName = iso.getClass().getSimpleName()+ElementIdGenerator.getNewId();
 			subOpName = parse(tree.input);
 			builder.setBolt(opName, iso, 1).shuffleGrouping(subOpName);
-			return opName;
+			break;
 			
 		case SELECTION:
 			SelectionOperator so = new SelectionOperator(tree);
-			opName = so.getClass().getSimpleName()+topologyId;
+			opName = so.getClass().getSimpleName()+ElementIdGenerator.getNewId();
 			subOpName = parse(tree.input);
 			builder.setBolt(opName, so, Constants.PARALLELISM).fieldsGrouping(subOpName, new Fields(StormFields.id));
-			return opName;
+			break;
 			
 		case GROUPBY_AGGREGATION:
 			StormGrouper sg = new StormGrouper(tree.groupby_attribute_name);
-			String sgName = sg.getClass().getSimpleName()+topologyId;
+			String sgName = sg.getClass().getSimpleName()+ElementIdGenerator.getNewId();
 			AggregationOperator ao = new AggregationOperator(tree);
-			opName = ao.getClass().getSimpleName()+topologyId;
+			opName = ao.getClass().getSimpleName()+ElementIdGenerator.getNewId();
 			subOpName = parse(tree.input);
 			builder.setBolt(sgName, sg, Constants.PARALLELISM).fieldsGrouping(subOpName, new Fields(StormFields.id));
 			builder.setBolt(opName, ao, Constants.PARALLELISM).fieldsGrouping(sgName, new Fields(StormFields.groupKey));
-			return opName;
+			break;
 			
 		case EXPAND:
 			ExpandOperator eo = new ExpandOperator(tree);
-			opName = eo.getClass().getSimpleName()+topologyId;
+			opName = eo.getClass().getSimpleName()+ElementIdGenerator.getNewId();
 			subOpName = parse(tree.input);
 			builder.setBolt(opName, eo, Constants.PARALLELISM).fieldsGrouping(subOpName, new Fields(StormFields.id));
-			return opName;
+			break;
 
 		case PROJECTION:
 			ProjectionOperator po = new ProjectionOperator(tree);
-			opName = po.getClass().getSimpleName()+topologyId;
+			opName = po.getClass().getSimpleName()+ElementIdGenerator.getNewId();
 			subOpName = parse(tree.input);
 			builder.setBolt(opName, po, Constants.PARALLELISM).fieldsGrouping(subOpName, new Fields(StormFields.id));
-			return opName;
+			break;
 			
 		case JOIN:
 			StormGrouper sg1 = new StormGrouper(tree.left_join_attribute, 1);
-			String sg1Name = sg1.getClass().getSimpleName()+topologyId;
+			String sg1Name = sg1.getClass().getSimpleName()+ElementIdGenerator.getNewId();
 			StormGrouper sg2 = new StormGrouper(tree.right_join_attribute, 2);
-			String sg2Name = sg2.getClass().getSimpleName()+topologyId;
+			String sg2Name = sg2.getClass().getSimpleName()+ElementIdGenerator.getNewId();
 			
 			JoinOperator jo = new JoinOperator(tree);
-			opName = jo.getClass().getSimpleName()+topologyId;
+			opName = jo.getClass().getSimpleName()+ElementIdGenerator.getNewId();
 			subOpName = parse(tree.left_input);
 			String subOpName2 = parse(tree.right_input);
 			builder.setBolt(sg1Name, sg1, Constants.PARALLELISM).fieldsGrouping(subOpName, new Fields(StormFields.id));
@@ -224,7 +241,7 @@ public class RegisterForStorm extends Register{
 			builder.setBolt(opName, jo, Constants.PARALLELISM)
 				.fieldsGrouping(sg1Name, new Fields(StormFields.groupKey))
 				.fieldsGrouping(sg2Name, new Fields(StormFields.groupKey));
-			return opName;
+			break;
 			
 		case PARTITIONWINDOW:
 			throw new SemanticErrorException("partition window not supported yet");
@@ -243,6 +260,8 @@ public class RegisterForStorm extends Register{
 			throw new SystemErrorException("shouldn't be here");
 		}
 		
+		nodeMap.put(tree, opName);
+		return opName;
 	}
 
 }

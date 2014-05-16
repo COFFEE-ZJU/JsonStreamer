@@ -38,7 +38,13 @@ import com.google.gson.reflect.TypeToken;
 public class RegisterForLocal extends Register{
 	private JStreamOutput outStream;
 	private List<Operator> opList = null;
+	private List<Operator> tmpOps = null;
 	private Map<JsonQueryTree, Operator> opMap = null;
+	
+	public RegisterForLocal(){
+		opList = new LinkedList<Operator>();
+		opMap = new HashMap<JsonQueryTree, Operator>();
+	}
 	
 	@Override
 	public void cancelQuery(){
@@ -47,26 +53,28 @@ public class RegisterForLocal extends Register{
 	}
 	
 	@Override
-	public void parse(String jsonApiString, JStreamOutput outStream) throws JsonStreamerException{
+	public void register(String jsonApiString, JStreamOutput outStream) throws JsonStreamerException{
+		super.register(jsonApiString, outStream);
+		
 		List<JsonQueryTree> jqt = new Gson().fromJson(jsonApiString, new TypeToken<List<JsonQueryTree> >(){}.getType());
 		this.outStream = outStream;
-		opList = new LinkedList<Operator>();
-		opMap = new HashMap<JsonQueryTree, Operator>();
+		tmpOps = new LinkedList<Operator>();
 		Iterator<JsonQueryTree> it = jqt.iterator();
 		JsonQueryTree curTree;
 		while(it.hasNext()){
 			curTree = it.next();
 			parse(curTree);
 		}
-		Scheduler.getInstance().addOperators(opList);
+		Scheduler.getInstance().addOperators(tmpOps);
+		opList.addAll(tmpOps);
 	}
 	
 	private Operator parse(JsonQueryTree tree) throws JsonStreamerException{
 		Operator retOp = null, subOp = null, subOp2 = null;
 		if(tree.type != JsonOpType.ROOT && tree.type != JsonOpType.ERROR){
-			System.out.println("\ntree's type: "+tree.type);
-			System.out.println("tree's content: "+Constants.gson.toJson(tree));
-			System.out.println("tree's hashcode: "+tree.hashCode());
+//			System.out.println("\ntree's type: "+tree.type);
+//			System.out.println("tree's content: "+Constants.gson.toJson(tree));
+//			System.out.println("tree's hashcode: "+tree.hashCode());
 			retOp = opMap.get(tree);
 			if(retOp != null) return retOp;
 		}
@@ -147,7 +155,7 @@ public class RegisterForLocal extends Register{
 			throw new SystemErrorException("shouldn't be here");
 		}
 		
-		opList.add(retOp);
+		tmpOps.add(retOp);
 		opMap.put(tree, retOp);
 		return retOp;
 	}
