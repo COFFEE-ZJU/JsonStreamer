@@ -33,6 +33,7 @@ public class ExpandOperator extends OperatorOneInOneOut{
 	
 	@Override
     public void prepare(Map stormConf, TopologyContext context) {
+		super.prepare(stormConf, context);
 		projDealer = ProjectionDealer.genProjectionDealer(proj);
 //		synopsis = new HashMap<Long, Element>();
 		relatedMap = new HashMap<Long, Set<Long>>();
@@ -53,7 +54,7 @@ public class ExpandOperator extends OperatorOneInOneOut{
 			newIds.add(newId);
 //			synopsis.put(newId, newEle);
 			curCollector.emit(new Values(newId, 
-					new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp)));
+					gson.toJson(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp))));
 //			outputQueue.add(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp));
 		}
 		relatedMap.put(id, newIds);
@@ -72,7 +73,7 @@ public class ExpandOperator extends OperatorOneInOneOut{
 //			eleToDelete = synopsis.get(eleIdToDelete);
 //			synopsis.remove(eleIdToDelete);
 			curCollector.emit(new Values(eleIdToDelete, 
-					new MarkedElement(null, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp)));
+					gson.toJson(new MarkedElement(null, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp))));
 //			outputQueue.add(new MarkedElement(eleToDelete, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp));
 		}
 	}

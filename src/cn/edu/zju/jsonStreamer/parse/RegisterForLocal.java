@@ -26,15 +26,23 @@ import cn.edu.zju.jsonStreamer.operators.RangeWindowOperator;
 import cn.edu.zju.jsonStreamer.operators.RootOperator;
 import cn.edu.zju.jsonStreamer.operators.RowWindowOperator;
 import cn.edu.zju.jsonStreamer.operators.SelectionOperator;
+import cn.edu.zju.jsonStreamer.scheduler.Scheduler;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-public class APIParserForLocal {
+public class RegisterForLocal extends Register{
 	private JStreamOutput outStream;
-	private List<Operator> opList;
+	private List<Operator> opList = null;
 	
-	public List<Operator> parse(String jsonApiString, JStreamOutput outStream) throws JsonStreamerException{
+	@Override
+	public void cancelQuery(){
+		Scheduler.getInstance().removeOperators(opList);
+		opList = null;
+	}
+	
+	@Override
+	public void parse(String jsonApiString, JStreamOutput outStream) throws JsonStreamerException{
 		List<JsonQueryTree> jqt = new Gson().fromJson(jsonApiString, new TypeToken<List<JsonQueryTree> >(){}.getType());
 		this.outStream = outStream;
 		opList = new LinkedList<Operator>();
@@ -44,8 +52,7 @@ public class APIParserForLocal {
 			curTree = it.next();
 			parse(curTree);
 		}
-
-		return opList;
+		Scheduler.getInstance().addOperators(opList);
 	}
 	
 	private Operator parse(JsonQueryTree tree) throws JsonStreamerException{

@@ -7,16 +7,18 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Queue;
 
 import cn.edu.zju.jsonStreamer.IO.output.JStreamOutput;
 import cn.edu.zju.jsonStreamer.IO.output.SocketStreamOutput;
+import cn.edu.zju.jsonStreamer.constants.Constants;
 import cn.edu.zju.jsonStreamer.constants.Constants.ConnectionCmds;
+import cn.edu.zju.jsonStreamer.constants.Constants.ExecutionMode;
 import cn.edu.zju.jsonStreamer.constants.JsonStreamerException;
-import cn.edu.zju.jsonStreamer.operators.Operator;
-import cn.edu.zju.jsonStreamer.parse.APIParserForLocal;
+import cn.edu.zju.jsonStreamer.parse.Register;
+import cn.edu.zju.jsonStreamer.parse.RegisterForLocal;
 import cn.edu.zju.jsonStreamer.parse.QueryParser;
-import cn.edu.zju.jsonStreamer.scheduler.Scheduler;
+import cn.edu.zju.jsonStreamer.parse.RegisterForStorm;
 import cn.edu.zju.jsonStreamer.utils.UserInfo;
 
 
@@ -24,21 +26,26 @@ public class JsonStreamerThread implements Runnable{
 	private enum State{USER, PW, VERIFIED, IN_QUERY};
 	private Socket socket;
 	private int threadNo;
-	private List<Operator> allOperators;
+	private Queue<Register> allQueries;
 	public JsonStreamerThread(Socket s, int no){
 		socket = s;
 		threadNo = no;
-		allOperators = new LinkedList<Operator>();
+		allQueries = new LinkedList<Register>();
 	}
 	
 	private void registerQueryFromSocket(String query, OutputStream outputStream) throws JsonStreamerException, IOException{
 		JStreamOutput output = new SocketStreamOutput(outputStream);
 		String api = QueryParser.parseToAPI(query);
-		List<Operator> opList = new APIParserForLocal().parse(api, output);
+		Register reg;
+		if(Constants.EXECUTION_MODE == ExecutionMode.LOCAL)
+			reg = new RegisterForLocal();
+		else
+			reg = new RegisterForStorm();
+		
+		reg.parse(api, output);
 		
 		outputStream.write("Query Registered!\r\n".getBytes());
-		Scheduler.getInstance().addOperators(opList);
-		allOperators.addAll(opList);
+		allQueries.add(reg);
 		
 	}
 	
@@ -136,9 +143,8 @@ public class JsonStreamerThread implements Runnable{
 				}
 			}
 			
-			if(! allOperators.isEmpty()){
-				if(! Scheduler.getInstance().removeOperators(allOperators))
-					throw new RuntimeException("something wrong!!!");
+			while(! allQueries.isEmpty()){
+				allQueries.poll().cancelQuery();
 			}
 			out.flush();
 	        out.close();

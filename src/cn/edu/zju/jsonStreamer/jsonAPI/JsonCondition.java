@@ -1,11 +1,13 @@
 package cn.edu.zju.jsonStreamer.jsonAPI;
+import java.io.Serializable;
+
 import cn.edu.zju.jsonStreamer.constants.Constants;
 import cn.edu.zju.jsonStreamer.constants.Constants.JsonCondType;
 
 import com.google.gson.annotations.Expose;
 
 
-public class JsonCondition {
+public class JsonCondition implements Serializable{
 	@Expose public String type = "CONDITION_OBJ";
 	@Expose public JsonCondType condition_type = null;		//AND, OR, NOT, GT, GE, LT, LE, EQ, NE, BOOL
 	@Expose public JsonCondition condition = null;

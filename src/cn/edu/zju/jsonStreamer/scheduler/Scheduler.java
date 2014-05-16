@@ -1,9 +1,11 @@
 package cn.edu.zju.jsonStreamer.scheduler;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import cn.edu.zju.jsonStreamer.IO.output.JStreamOutput;
 import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
 import cn.edu.zju.jsonStreamer.operators.Operator;
 import cn.edu.zju.jsonStreamer.utils.StoppableThread;
@@ -16,7 +18,7 @@ public class Scheduler extends StoppableThread{
 	private static Scheduler scheduler = null;
 	
 	private Scheduler(){
-		opList = new LinkedList<Operator>();
+		opList = Collections.synchronizedList(new LinkedList<Operator>());
 	}
 	
 	public static Scheduler getInstance(){
@@ -91,48 +93,38 @@ public class Scheduler extends StoppableThread{
 	}
 	
 	public void addOperator(Operator operator){
-		synchronized (opList) {
-			opList.add(operator);
-			iterator = opList.iterator();
-		}
+		opList.add(operator);
+		iterator = opList.iterator();
 	}
 	
 	public void addOperators(List<Operator> operatorList){
-		synchronized (opList) {
-			this.opList.addAll(operatorList);
-			iterator = opList.iterator();
-		}
+		this.opList.addAll(operatorList);
+		iterator = opList.iterator();
 	}
 	
 	public boolean removeOperator(Operator operator){
-		synchronized (opList) {
-			if(! opList.remove(operator))
-				return false;
-			
-			iterator = opList.iterator();
-			return true;
-		}
+		if(! opList.remove(operator))
+			return false;
+		
+		iterator = opList.iterator();
+		return true;
 	}
 	
 	public boolean removeOperators(List<Operator> operatorList){
-		synchronized (opList) {
-			if(! opList.removeAll(operatorList))
-				return false;
-			
-			iterator = opList.iterator();
-			return true;
-		}
+		if(! opList.removeAll(operatorList))
+			return false;
+		
+		iterator = opList.iterator();
+		return true;
 	}
 	
 	private Operator getNextOperator() throws SystemErrorException{
-		synchronized (opList) {
-			if(isEmpty())
-				return null;
-			if(iterator.hasNext()) return iterator.next();
-			else{
-				iterator = opList.iterator();
-				return iterator.next();
-			}
+		if(isEmpty())
+			return null;
+		if(iterator.hasNext()) return iterator.next();
+		else{
+			iterator = opList.iterator();
+			return iterator.next();
 		}
 	}
 }

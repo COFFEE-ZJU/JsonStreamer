@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
+import com.google.gson.Gson;
+
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.tuple.Tuple;
@@ -20,6 +22,8 @@ public class RangeWindowOperator extends Operator{
 	private final long timeRange;		//time unit: millisecond  0 for now; -1 for unbounded
 	private Queue<Long> synopsis;
 	private Queue<Long> timeSynopsis;
+	
+	protected Gson gson;
 	
 	public RangeWindowOperator(JsonQueryTree tree) throws SystemErrorException{
 		super(tree);
@@ -70,13 +74,15 @@ public class RangeWindowOperator extends Operator{
 
 	@Override
     public void prepare(Map stormConf, TopologyContext context) {
+		gson = new Gson();
 		synopsis = new LinkedList<Long>();
 		timeSynopsis = new LinkedList<Long>();
 	}
 
 	@Override
 	public void execute(Tuple input, BasicOutputCollector collector) {
-		MarkedElement me = (MarkedElement)input.getValueByField(StormFields.markedElement);
+//		MarkedElement me = (MarkedElement)input.getValueByField(StormFields.markedElement);
+		MarkedElement me = gson.fromJson(input.getStringByField(StormFields.markedElement), MarkedElement.class);
 		if(me.mark == ElementMark.MINUS) throw new RuntimeException("stream element can't be MINUS marked");
 		if(timeRange != -1){
 			long cutTime = me.timeStamp - timeRange;
@@ -88,7 +94,7 @@ public class RangeWindowOperator extends Operator{
 					eleIdToDelete = synopsis.poll();
 					timeSynopsis.poll();
 					collector.emit(new Values(eleIdToDelete, 
-							new MarkedElement(null, eleIdToDelete, ElementMark.MINUS, me.timeStamp)));
+							gson.toJson(new MarkedElement(null, eleIdToDelete, ElementMark.MINUS, me.timeStamp))));
 				}
 				else break;
 			}

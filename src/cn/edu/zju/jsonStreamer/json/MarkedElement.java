@@ -1,8 +1,10 @@
 package cn.edu.zju.jsonStreamer.json;
 
+import java.io.Serializable;
+
 import cn.edu.zju.jsonStreamer.constants.Constants.ElementMark;
 
-public class MarkedElement {
+public class MarkedElement implements Serializable{
 	public final Element element;
 	public final long id;
 	public ElementMark mark;

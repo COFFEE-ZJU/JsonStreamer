@@ -24,6 +24,7 @@ public class SelectionOperator extends OperatorOneInOneOut{
 	
 	@Override
     public void prepare(Map stormConf, TopologyContext context) {
+		super.prepare(stormConf, context);
 		condDealer = ConditionDealer.genConditionDealer(selectCond);
 		synopsis = new HashSet<Long>();
     }

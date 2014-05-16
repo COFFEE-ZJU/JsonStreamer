@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.gson.Gson;
+
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.tuple.Tuple;
@@ -34,6 +36,8 @@ public class JoinOperator extends Operator{
 	private ProjectionDealer projDealer;
 	private final JsonProjection proj;
 	
+	protected Gson gson;
+	
 //	private Queue<MarkedElement> leftInputQueue = null, rightInputQueue = null;
 //	private Queue<MarkedElement> outputQueue = null;
 	public JoinOperator(JsonQueryTree tree) {
@@ -44,6 +48,7 @@ public class JoinOperator extends Operator{
 	
 	@Override
     public void prepare(Map stormConf, TopologyContext context) {
+		gson = new Gson();
 		leftGroupKeyMap = new HashMap<Integer, Set<Long>>();
 		rightGroupKeyMap = new HashMap<Integer, Set<Long>>();
 		
@@ -103,7 +108,7 @@ public class JoinOperator extends Operator{
 				set.add(newId);
 				synopsis.add(newId);
 				curCollector.emit(new Values(newId, 
-						new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp)));
+						gson.toJson(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp))));
 			}
 			mapper.put(id, set);
 		}
@@ -167,7 +172,7 @@ public class JoinOperator extends Operator{
 			synopsis.remove(eleIdToDelete);
 			
 			curCollector.emit(new Values(eleIdToDelete, 
-					new MarkedElement(null, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp)));
+					gson.toJson(new MarkedElement(null, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp))));
 //			outputQueue.add(new MarkedElement(eleToDelete, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp));
 		}
 		
@@ -183,9 +188,9 @@ public class JoinOperator extends Operator{
 		else if(sourceId == 2) source = Source.RIGHT;
 		else throw new RuntimeException("source id worng!!!");
 		
-		Element keyEle = (Element)input.getValueByField(StormFields.groupKey);
+		Element keyEle = gson.fromJson(input.getStringByField(StormFields.groupKey), Element.class);
 		
-		MarkedElement me = (MarkedElement)input.getValueByField(StormFields.markedElement);
+		MarkedElement me = gson.fromJson(input.getStringByField(StormFields.markedElement), MarkedElement.class);
 		if(me.mark == ElementMark.MINUS) processMinus(keyEle, me, source);
 		else processPlus(keyEle, me, source);
 		

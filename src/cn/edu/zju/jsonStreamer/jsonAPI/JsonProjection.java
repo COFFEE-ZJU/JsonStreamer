@@ -1,5 +1,6 @@
 package cn.edu.zju.jsonStreamer.jsonAPI;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +11,7 @@ import cn.edu.zju.jsonStreamer.json.JsonSchema;
 import com.google.gson.annotations.Expose;
 
 
-public class JsonProjection {
+public class JsonProjection implements Serializable{
 	@Expose public String type = "PROJECTION_OBJ";
 //	public Boolean need_rename = null;
 //	public String rename = null;

@@ -40,7 +40,7 @@ public class WrapperManager {
 	public static JStreamInput getStreamInputByWrapper(String wrapperName) throws SystemErrorException{
 		Wrapper wrapper = getWrapperByName(wrapperName);
 		try {
-			Class<?> c = Class.forName("cn.edu.zju.jsonStreamer.IO."+wrapper.implement_class);
+			Class<?> c = Class.forName("cn.edu.zju.jsonStreamer.IO.input."+wrapper.implement_class);
 			Constructor<?> constructor = c.getConstructor();
 			Object o = constructor.newInstance();
 //			Constructor<?> constructor = c.getConstructor(JsonSchema.class);

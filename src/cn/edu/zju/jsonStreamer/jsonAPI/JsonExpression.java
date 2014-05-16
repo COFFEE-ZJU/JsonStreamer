@@ -1,5 +1,6 @@
 package cn.edu.zju.jsonStreamer.jsonAPI;
 
+import java.io.Serializable;
 import java.util.List;
 
 import cn.edu.zju.jsonStreamer.constants.Constants;
@@ -13,7 +14,7 @@ import com.google.gson.annotations.Expose;
 
 
 
-public class JsonExpression {
+public class JsonExpression implements Serializable{
 	@Expose public String type = "EXPRESSION_OBJ";
 	@Expose public JsonExprType expression_type = null;		//ID, INT, NUMBER, BOOL, NULL, STRING, ADD, SUB, DIV, MUL, MOD, AGGREGATION
 	@Expose public AggrFuncNames aggregate_operation = null;

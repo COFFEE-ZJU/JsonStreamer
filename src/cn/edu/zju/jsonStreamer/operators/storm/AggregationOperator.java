@@ -29,6 +29,7 @@ public class AggregationOperator extends OperatorOneInOneOut{
 //	private final Map<Long, Integer> idToGroupKey;		//input Element Id to groupKey's hashCode
 	private ProjectionDealer projDealer;
 	private final JsonProjection proj;
+	private Map<Long, JsonElement> inputMapper;		//input element id to Json Element
 //	private final ExpressionDealer groupAttrDealer;
 	
 	public AggregationOperator(JsonQueryTree tree) {
@@ -39,11 +40,13 @@ public class AggregationOperator extends OperatorOneInOneOut{
 	
 	@Override
     public void prepare(Map stormConf, TopologyContext context) {
+		super.prepare(stormConf, context);
 		groupMap = new HashMap<Integer, JsonArray>();
 		projDealer = ProjectionDealer.genProjectionDealer(proj);
 //		groupAttrDealer = ExpressionDealer.genExpressionDealer(tree.groupby_attribute_name);
 //		synopsis = new HashMap<Long, Element>();
 		relatedMap = new HashMap<Integer, Long>();
+		inputMapper = new HashMap<Long, JsonElement>();
 //		idToGroupKey = new HashMap<Long, Integer>();
     }
 	
@@ -51,7 +54,8 @@ public class AggregationOperator extends OperatorOneInOneOut{
 	protected void processPlus(MarkedElement markedElement){
 		Long id = markedElement.id;
 		Element ele = markedElement.element;
-		Element groupByEle = (Element)curTuple.getValueByField(StormFields.groupKey);
+		inputMapper.put(id, ele.jsonElement);
+		Element groupByEle = gson.fromJson(curTuple.getStringByField(StormFields.groupKey), Element.class);
 		int groupByKey = groupByEle.hashCode();
 		JsonArray array;
 		if(! groupMap.containsKey(groupByKey)){
@@ -66,14 +70,14 @@ public class AggregationOperator extends OperatorOneInOneOut{
 //			Element eleToDelete = synopsis.get(eleIdToDelete);
 //			synopsis.remove(eleIdToDelete);
 			curCollector.emit(new Values(eleIdToDelete, 
-					new MarkedElement(null, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp)));
+					gson.toJson(new MarkedElement(null, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp))));
 //			outputQueue.add(new MarkedElement(eleToDelete, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp));
 		}
 		Element arrayToDeal = new Element(groupMap.get(groupByKey), JsonValueType.ARRAY);
 		Element newEle = projDealer.deal(arrayToDeal, groupByEle);
 		long newId = ElementIdGenerator.getNewId();
 		curCollector.emit(new Values(newId, 
-				new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp)));
+				gson.toJson(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp))));
 //		outputQueue.add(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp));
 		
 //		synopsis.put(newId, newEle);
@@ -85,16 +89,17 @@ public class AggregationOperator extends OperatorOneInOneOut{
 	protected void processMinus(MarkedElement markedElement){
 		Long id = markedElement.id;
 		Element ele = markedElement.element;
-		Element groupByEle = (Element)curTuple.getValueByField(StormFields.groupKey);
+		Element groupByEle = gson.fromJson(curTuple.getStringByField(StormFields.groupKey), Element.class);
 		int groupByKey = groupByEle.hashCode();
 		JsonArray array = groupMap.get(groupByKey);
-		JsonArray newA = removeElementInJsonArray(array, ele.jsonElement);
+		JsonArray newA = removeElementInJsonArray(array, inputMapper.get(id));
+		inputMapper.remove(id);
 		
 		long eleIdToDelete = relatedMap.get(groupByKey);
 //		Element eleToDelete = synopsis.get(eleIdToDelete);
 //		synopsis.remove(eleIdToDelete);
 		curCollector.emit(new Values(eleIdToDelete, 
-				new MarkedElement(null, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp)));
+				gson.toJson(new MarkedElement(null, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp))));
 //		outputQueue.add(new MarkedElement(eleToDelete, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp));
 		
 		if(newA.size() != 0){
@@ -103,7 +108,7 @@ public class AggregationOperator extends OperatorOneInOneOut{
 			Element newEle = projDealer.deal(arrayToDeal, groupByEle);
 			long newId = ElementIdGenerator.getNewId();
 			curCollector.emit(new Values(newId, 
-					new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp)));
+					gson.toJson(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp))));
 //			outputQueue.add(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp));
 //			synopsis.put(newId, newEle);
 			relatedMap.put(groupByKey, newId);

@@ -31,10 +31,11 @@ public class StreamSender extends cn.edu.zju.jsonStreamer.operators.Operator{
 	@Override
 	public void execute() throws SystemErrorException {
 		while(! inputStream.isEmpty()){
-			jedis.rpush(queueName, 
-					""+ElementIdGenerator.getNewId()+"|"+
+			String output = ""+ElementIdGenerator.getNewId()+"|"+
 					TimeStampGenerator.getCurrentTimeStamp()+"|"+
-					inputStream.getNextElement());
+					inputStream.getNextElement();
+			jedis.rpush(queueName, output);
+			if(Constants.DEBUG) System.out.println("streamSender: "+output);
 		}
 		
 	}

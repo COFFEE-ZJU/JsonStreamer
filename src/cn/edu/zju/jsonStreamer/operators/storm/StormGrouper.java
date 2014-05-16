@@ -3,6 +3,8 @@ package cn.edu.zju.jsonStreamer.operators.storm;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gson.Gson;
+
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -22,6 +24,7 @@ public class StormGrouper extends BaseBasicBolt{
 	private ExpressionDealer groupKeyDealer;
 	private final JsonExpression keyExpr;
 	private Integer sourceId = null;
+	protected Gson gson;
 	
 	public StormGrouper(JsonExpression keyExpr){
 		this(keyExpr, null);
@@ -33,6 +36,7 @@ public class StormGrouper extends BaseBasicBolt{
 
 	@Override
     public void prepare(Map stormConf, TopologyContext context) {
+		gson = new Gson();
 		synopsis = new HashMap<Long, Element>();
 		groupKeyDealer = ExpressionDealer.genExpressionDealer(keyExpr);
 	}
@@ -40,7 +44,9 @@ public class StormGrouper extends BaseBasicBolt{
 	@Override
 	public void execute(Tuple input, BasicOutputCollector collector) {
 		long id = input.getLongByField(StormFields.id);
-		MarkedElement me = (MarkedElement)input.getValueByField(StormFields.markedElement);
+//		MarkedElement me = (MarkedElement)input.getValueByField(StormFields.markedElement);
+		String meString = input.getStringByField(StormFields.markedElement);
+		MarkedElement me = gson.fromJson(meString, MarkedElement.class);
 		Element keyEle;
 		if(me.mark == ElementMark.PLUS){
 			keyEle = groupKeyDealer.deal(me.element);
@@ -52,8 +58,8 @@ public class StormGrouper extends BaseBasicBolt{
 		}
 		
 		if(sourceId == null)
-			collector.emit(new Values(id, keyEle, me));
-		else collector.emit(new Values(sourceId, id, keyEle, me));
+			collector.emit(new Values(id, gson.toJson(keyEle), meString));
+		else collector.emit(new Values(sourceId, id, gson.toJson(keyEle), meString));
 	}
 
 	@Override

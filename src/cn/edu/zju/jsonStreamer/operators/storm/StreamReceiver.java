@@ -26,6 +26,10 @@ public class StreamReceiver extends cn.edu.zju.jsonStreamer.operators.Operator{
 		jedis = new Jedis("127.0.0.1");
 	}
 	
+	public String getQueueName(){
+		return queueName;
+	}
+	
 	@Override
 	public final void execute() throws SystemErrorException{
 		String json;

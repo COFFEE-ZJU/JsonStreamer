@@ -8,8 +8,9 @@ import java.util.Map;
 import com.google.gson.Gson;
 
 public class Constants {
+	public static final boolean DEBUG = true;
 	public static enum ExecutionMode{LOCAL, STORM};
-	public static final ExecutionMode EXECUTION_MODE = ExecutionMode.LOCAL;
+	public static final ExecutionMode EXECUTION_MODE = ExecutionMode.STORM;
 	
 	public static final int COMPILER_PORT = 3000;
 	public static final int SCHEMA_SERVER_PORT = 2048;
@@ -108,6 +109,8 @@ public class Constants {
 	};
 	
 	//for storm
+	public static final int PARALLELISM = 3;
+	public static final boolean STORM_LOCAL = false;
 	public static class StormFields{
 		public static final String markedElement = "marked_element";
 		public static final String timeStamp = "time_stamp";
@@ -122,6 +125,7 @@ public class Constants {
 	
 	private static String myIp = null;
 	public static String getMyIp() throws SystemErrorException{
+//		return "127.0.0.1";
 		if(myIp != null) return myIp;
 		InetAddress addr = null;
 		try {

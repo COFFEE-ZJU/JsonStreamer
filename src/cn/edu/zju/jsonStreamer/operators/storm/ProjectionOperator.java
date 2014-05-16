@@ -26,6 +26,7 @@ public class ProjectionOperator extends OperatorOneInOneOut{
 	
 	@Override
     public void prepare(Map stormConf, TopologyContext context) {
+		super.prepare(stormConf, context);
 		projDealer = ProjectionDealer.genProjectionDealer(proj);
 //		synopsis = new HashMap<Long, Element>();
 		relatedMap = new HashMap<Long, Long>();
@@ -39,7 +40,7 @@ public class ProjectionOperator extends OperatorOneInOneOut{
 		long newId = ElementIdGenerator.getNewId();
 //		synopsis.put(newId, newEle);
 		curCollector.emit(new Values(newId, 
-				new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp)));
+				gson.toJson(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp))));
 //		outputQueue.add(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp));
 		relatedMap.put(id, newId);
 	}
@@ -50,7 +51,7 @@ public class ProjectionOperator extends OperatorOneInOneOut{
 		long eleIdToDelete = relatedMap.get(id);
 //		Element eleToDelete = synopsis.get(eleIdToDelete);
 		curCollector.emit(new Values(eleIdToDelete, 
-				new MarkedElement(null, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp)));
+				gson.toJson(new MarkedElement(null, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp))));
 //		outputQueue.add(new MarkedElement(eleToDelete, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp));
 		relatedMap.remove(id);
 //		synopsis.remove(eleIdToDelete);

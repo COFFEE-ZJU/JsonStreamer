@@ -35,7 +35,8 @@ public class RootOperator extends BaseBasicBolt{
 
 	@Override
 	public void execute(Tuple input, BasicOutputCollector collector) {
-		MarkedElement me = (MarkedElement)input.getValueByField(StormFields.markedElement);
+//		MarkedElement me = (MarkedElement)input.getValueByField(StormFields.markedElement);
+		MarkedElement me = gson.fromJson(input.getStringByField(StormFields.markedElement), MarkedElement.class);
 		client.rpush(queueName, gson.toJson(me.element.jsonElement));
 	}
 	

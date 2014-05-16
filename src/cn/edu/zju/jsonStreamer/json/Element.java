@@ -1,11 +1,13 @@
 package cn.edu.zju.jsonStreamer.json;
 
+import java.io.Serializable;
+
 import cn.edu.zju.jsonStreamer.constants.Constants.JsonValueType;
 
 import com.google.gson.JsonElement;
 
 
-public class Element {
+public class Element implements Serializable{
 	public final JsonValueType type;
 	public final JsonElement jsonElement;
 //	public Element(String jsonString){

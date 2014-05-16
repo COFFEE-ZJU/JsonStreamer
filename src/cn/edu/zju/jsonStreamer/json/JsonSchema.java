@@ -1,4 +1,5 @@
 package cn.edu.zju.jsonStreamer.json;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -11,7 +12,7 @@ import com.google.gson.annotations.Expose;
 
 
 
-public class JsonSchema {
+public class JsonSchema implements Serializable{
 	private JsonValueType valueType = null; 	//can be any type
 	@Expose private String type = null; 	//can be any type
 	@Expose public JsonSchema items = null;				//for array type only
