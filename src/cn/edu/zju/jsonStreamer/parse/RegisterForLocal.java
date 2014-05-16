@@ -1,11 +1,15 @@
 package cn.edu.zju.jsonStreamer.parse;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 import cn.edu.zju.jsonStreamer.IO.output.JStreamOutput;
+import cn.edu.zju.jsonStreamer.constants.Constants.JsonOpType;
+import cn.edu.zju.jsonStreamer.constants.Constants;
 import cn.edu.zju.jsonStreamer.constants.JsonStreamerException;
 import cn.edu.zju.jsonStreamer.constants.SemanticErrorException;
 import cn.edu.zju.jsonStreamer.constants.SyntaxErrorException;
@@ -34,6 +38,7 @@ import com.google.gson.reflect.TypeToken;
 public class RegisterForLocal extends Register{
 	private JStreamOutput outStream;
 	private List<Operator> opList = null;
+	private Map<JsonQueryTree, Operator> opMap = null;
 	
 	@Override
 	public void cancelQuery(){
@@ -46,6 +51,7 @@ public class RegisterForLocal extends Register{
 		List<JsonQueryTree> jqt = new Gson().fromJson(jsonApiString, new TypeToken<List<JsonQueryTree> >(){}.getType());
 		this.outStream = outStream;
 		opList = new LinkedList<Operator>();
+		opMap = new HashMap<JsonQueryTree, Operator>();
 		Iterator<JsonQueryTree> it = jqt.iterator();
 		JsonQueryTree curTree;
 		while(it.hasNext()){
@@ -57,7 +63,14 @@ public class RegisterForLocal extends Register{
 	
 	private Operator parse(JsonQueryTree tree) throws JsonStreamerException{
 		Operator retOp = null, subOp = null, subOp2 = null;
-		
+		if(tree.type != JsonOpType.ROOT && tree.type != JsonOpType.ERROR){
+			System.out.println("\ntree's type: "+tree.type);
+			System.out.println("tree's content: "+Constants.gson.toJson(tree));
+			System.out.println("tree's hashcode: "+tree.hashCode());
+			retOp = opMap.get(tree);
+			if(retOp != null) return retOp;
+		}
+	
 		switch (tree.type) {
 		case ROOT:
 			retOp = new RootOperator(tree, outStream);
@@ -135,6 +148,7 @@ public class RegisterForLocal extends Register{
 		}
 		
 		opList.add(retOp);
+		opMap.put(tree, retOp);
 		return retOp;
 	}
 	

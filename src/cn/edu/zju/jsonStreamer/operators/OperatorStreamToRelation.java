@@ -11,7 +11,7 @@ import cn.edu.zju.jsonStreamer.jsonAPI.JsonQueryTree;
 
 public abstract class OperatorStreamToRelation extends Operator{
 	protected Queue<MarkedElement> inputQueue = null;
-	protected Queue<MarkedElement> outputQueue = null;
+//	protected Queue<MarkedElement> outputQueue = null;
 	
 	protected final Queue<MarkedElement> synopsis;
 	
@@ -20,14 +20,14 @@ public abstract class OperatorStreamToRelation extends Operator{
 		synopsis = new LinkedList<MarkedElement>();
 	}
 	
-	protected abstract void process(MarkedElement markedElement);
+	protected abstract void process(MarkedElement markedElement) throws SystemErrorException;
 	
 	@Override
 	public final void execute() throws SystemErrorException {
-		if(inputQueue == null || outputQueue == null){
-			if(inputQueueList.size() != 1 || outputQueueList.size() != 1) throw new SystemErrorException("queue size abnormal");
+		if(inputQueue == null){
+			if(inputQueueList.size() != 1) throw new SystemErrorException("queue size abnormal");
 			inputQueue = inputQueueList.get(0);
-			outputQueue = outputQueueList.get(0);
+//			outputQueue = outputQueueList.get(0);
 		}
 		MarkedElement me;
 		while(! inputQueue.isEmpty()){

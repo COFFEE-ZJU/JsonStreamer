@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cn.edu.zju.jsonStreamer.constants.Constants.ElementMark;
+import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
 import cn.edu.zju.jsonStreamer.json.Element;
 import cn.edu.zju.jsonStreamer.json.MarkedElement;
 import cn.edu.zju.jsonStreamer.jsonAPI.JsonQueryTree;
@@ -23,22 +24,22 @@ public class ProjectionOperator extends OperatorOneInOneOut{
 	}
 	
 	@Override
-	protected void processPlus(MarkedElement markedElement){
+	protected void processPlus(MarkedElement markedElement) throws SystemErrorException{
 		Long id = markedElement.id;
 		Element ele = markedElement.element;
 		Element newEle = projDealer.deal(ele);
 		long newId = ElementIdGenerator.getNewId();
 		synopsis.put(newId, newEle);
-		outputQueue.add(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp));
+		output(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp));
 		relatedMap.put(id, newId);
 	}
 	
 	@Override
-	protected void processMinus(MarkedElement markedElement){
+	protected void processMinus(MarkedElement markedElement) throws SystemErrorException{
 		Long id = markedElement.id;
 		long eleIdToDelete = relatedMap.get(id);
 		Element eleToDelete = synopsis.get(eleIdToDelete);
-		outputQueue.add(new MarkedElement(eleToDelete, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp));
+		output(new MarkedElement(eleToDelete, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp));
 		relatedMap.remove(id);
 		synopsis.remove(eleIdToDelete);
 	}

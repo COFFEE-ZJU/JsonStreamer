@@ -3,6 +3,7 @@ package cn.edu.zju.jsonStreamer.operators;
 import java.util.HashMap;
 import java.util.Map;
 
+import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
 import cn.edu.zju.jsonStreamer.json.Element;
 import cn.edu.zju.jsonStreamer.json.MarkedElement;
 import cn.edu.zju.jsonStreamer.jsonAPI.JsonQueryTree;
@@ -15,21 +16,21 @@ public class SelectionOperator extends OperatorOneInOneOut{
 	private final Map<Long, Element> synopsis;
 	
 	@Override
-	protected void processPlus(MarkedElement markedElement){
+	protected void processPlus(MarkedElement markedElement) throws SystemErrorException{
 		Long id = markedElement.id;
 		Element ele = markedElement.element;
 		if(condDealer.deal(ele)){
 			synopsis.put(id, ele);
-			outputQueue.add(markedElement);
+			output(markedElement);
 		}
 	}
 	
 	@Override
-	protected void processMinus(MarkedElement markedElement){
+	protected void processMinus(MarkedElement markedElement) throws SystemErrorException{
 		Long id = markedElement.id;
 		if(synopsis.containsKey(id)){
 			synopsis.remove(id);
-			outputQueue.add(markedElement);
+			output(markedElement);
 		}
 	}
 	

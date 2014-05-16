@@ -17,6 +17,11 @@ public class Scheduler extends StoppableThread{
 	private Operator currentOp;
 	private static Scheduler scheduler = null;
 	
+	public void printOps(){
+		System.out.println("operator number: " + opList.size());
+		System.out.println(opList);
+	}
+	
 	private Scheduler(){
 		opList = Collections.synchronizedList(new LinkedList<Operator>());
 	}
@@ -119,12 +124,14 @@ public class Scheduler extends StoppableThread{
 	}
 	
 	private Operator getNextOperator() throws SystemErrorException{
-		if(isEmpty())
-			return null;
-		if(iterator.hasNext()) return iterator.next();
-		else{
-			iterator = opList.iterator();
-			return iterator.next();
+		synchronized (opList) {
+			if(isEmpty())
+				return null;
+			if(iterator.hasNext()) return iterator.next();
+			else{
+				iterator = opList.iterator();
+				return iterator.next();
+			}
 		}
 	}
 }

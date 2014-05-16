@@ -30,7 +30,7 @@ public class JoinOperator extends Operator{
 	private final ProjectionDealer projDealer;
 	
 	private Queue<MarkedElement> leftInputQueue = null, rightInputQueue = null;
-	private Queue<MarkedElement> outputQueue = null;
+//	private Queue<MarkedElement> outputQueue = null;
 	public JoinOperator(JsonQueryTree tree) {
 		super(tree);
 		leftRelatedMapper = new HashMap<Long, Set<Long> >();
@@ -45,7 +45,7 @@ public class JoinOperator extends Operator{
 		projDealer = ProjectionDealer.genProjectionDealer(tree.projection);
 	}
 	
-	private void processPlus(MarkedElement markedElement, Source source){
+	private void processPlus(MarkedElement markedElement, Source source) throws SystemErrorException{
 		Long id = markedElement.id;
 		Element ele = markedElement.element;
 		Map<Long, Set<Long> > mapper;
@@ -81,7 +81,7 @@ public class JoinOperator extends Operator{
 				synopsis.put(newId, newEle);
 				set.add(newId);
 				
-				outputQueue.add(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp));
+				output(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp));
 			}
 			
 		}
@@ -89,7 +89,7 @@ public class JoinOperator extends Operator{
 		if(! set.isEmpty()) mapper.put(id, set);
 	}
 	
-	private void processMinus(MarkedElement markedElement, Source source){
+	private void processMinus(MarkedElement markedElement, Source source) throws SystemErrorException{
 		Long id = markedElement.id;
 		Map<Long, Set<Long> > mapper;
 		if(source == Source.LEFT){
@@ -111,7 +111,7 @@ public class JoinOperator extends Operator{
 			if(! synopsis.containsKey(eleIdToDelete)) continue;		//already deleted
 			eleToDelete = synopsis.get(eleIdToDelete);
 			synopsis.remove(eleToDelete);
-			outputQueue.add(new MarkedElement(eleToDelete, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp));
+			output(new MarkedElement(eleToDelete, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp));
 		}
 		
 		mapper.remove(id);
@@ -119,12 +119,11 @@ public class JoinOperator extends Operator{
 
 	@Override
 	public void execute() throws SystemErrorException {
-		if(leftInputQueue == null || rightInputQueue == null || outputQueue == null){
-			if(inputQueueList.size() != 2 || outputQueueList.size() != 1)
+		if(leftInputQueue == null || rightInputQueue == null){
+			if(inputQueueList.size() != 2)
 				throw new SystemErrorException("queue size abnormal");
 			leftInputQueue = inputQueueList.get(0);
 			rightInputQueue = inputQueueList.get(1);
-			outputQueue = outputQueueList.get(0);
 		}
 		while(! leftInputQueue.isEmpty() && ! rightInputQueue.isEmpty()){
 			MarkedElement leftMe = leftInputQueue.peek();

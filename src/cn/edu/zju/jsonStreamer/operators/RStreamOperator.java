@@ -18,16 +18,6 @@ public class RStreamOperator extends OperatorOneInOneOut{
 		synopsis = new LinkedList<Element>();
 	}
 
-	private void output(MarkedElement markedElement) {
-		long now = markedElement.timeStamp;
-		Iterator<Element> it = synopsis.iterator();
-		Element ele;
-		while(it.hasNext()){
-			ele = it.next();
-			outputQueue.add(new MarkedElement(ele, -1, ElementMark.UNMARKED, now));
-		}
-	}
-
 	@Override
 	protected void processMinus(MarkedElement markedElement) throws SystemErrorException {
 		if(! synopsis.remove(markedElement.element))
@@ -37,7 +27,7 @@ public class RStreamOperator extends OperatorOneInOneOut{
 	}
 
 	@Override
-	protected void processPlus(MarkedElement markedElement) {
+	protected void processPlus(MarkedElement markedElement) throws SystemErrorException {
 		synopsis.add(markedElement.element);
 		output(markedElement);
 	}

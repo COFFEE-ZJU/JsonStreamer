@@ -28,6 +28,13 @@ public abstract class Operator {
 		outputQueueList = new LinkedList<Queue<MarkedElement> >();
 	}
 	
+	protected final void output(MarkedElement me) throws SystemErrorException{
+		if(outputQueueList.isEmpty()) throw new SystemErrorException("empty output list");
+		for(Queue<MarkedElement> queue: outputQueueList){
+			queue.add(me);
+		}
+	}
+	
 	public abstract void execute() throws SystemErrorException;
 	public OperatorState getState(){
 		return state;

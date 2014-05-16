@@ -1,0 +1,13 @@
+USER:user
+PW:123123
+QUERY_START
+
+
+QUERY:streamT = readFromWrapper ("employee_wrapper", true) ;
+
+QUERY:tmpv = streamT -> window[range now];
+QUERY:tmpv  ->  group  by  g  =  $.dept  into  {dept:g,  number: count($[*])} -> istream;
+
+QUERY:tmpv  ->  group  by  g  =  $.dept  into  {dept:g,  avgSalary: avg($[*].salary)} -> istream;
+
+QUERY_END

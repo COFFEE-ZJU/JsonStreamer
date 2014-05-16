@@ -5,6 +5,7 @@ import cn.edu.zju.jsonStreamer.constants.Constants;
 import cn.edu.zju.jsonStreamer.constants.Constants.JsonOpType;
 import cn.edu.zju.jsonStreamer.json.JsonSchema;
 
+import com.google.gson.JsonElement;
 import com.google.gson.annotations.Expose;
 
 
@@ -37,5 +38,16 @@ public class JsonQueryTree {
 	@Override
 	public String toString(){
 		return Constants.gson.toJson(this);
+	}
+	
+	@Override
+	public int hashCode(){
+		return Constants.gson.fromJson(toString(), JsonElement.class).hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object o){
+		if(! (o instanceof JsonQueryTree)) return false;
+		return ((JsonQueryTree)o).hashCode() == this.hashCode();
 	}
 }

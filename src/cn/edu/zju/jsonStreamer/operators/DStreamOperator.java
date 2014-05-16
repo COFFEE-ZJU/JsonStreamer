@@ -1,6 +1,7 @@
 package cn.edu.zju.jsonStreamer.operators;
 
 import cn.edu.zju.jsonStreamer.constants.Constants.ElementMark;
+import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
 import cn.edu.zju.jsonStreamer.json.MarkedElement;
 import cn.edu.zju.jsonStreamer.jsonAPI.JsonQueryTree;
 
@@ -10,9 +11,9 @@ public class DStreamOperator extends OperatorOneInOneOut{
 	}
 
 	@Override
-	protected void processMinus(MarkedElement markedElement) {
+	protected void processMinus(MarkedElement markedElement) throws SystemErrorException {
 		markedElement.mark = ElementMark.UNMARKED;
-		outputQueue.add(markedElement);
+		output(markedElement);
 	}
 
 	@Override

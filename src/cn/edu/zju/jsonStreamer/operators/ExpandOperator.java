@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import cn.edu.zju.jsonStreamer.constants.Constants.ElementMark;
+import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
 import cn.edu.zju.jsonStreamer.json.Element;
 import cn.edu.zju.jsonStreamer.json.MarkedElement;
 import cn.edu.zju.jsonStreamer.jsonAPI.JsonQueryTree;
@@ -30,7 +31,7 @@ public class ExpandOperator extends OperatorOneInOneOut{
 	}
 	
 	@Override
-	protected void processPlus(MarkedElement markedElement){
+	protected void processPlus(MarkedElement markedElement) throws SystemErrorException{
 		Long id = markedElement.id;
 		Element ele = markedElement.element;
 		JsonArray arrayEle = projDealer.deal(ele).jsonElement.getAsJsonArray();
@@ -43,13 +44,13 @@ public class ExpandOperator extends OperatorOneInOneOut{
 			newId = ElementIdGenerator.getNewId();
 			newIds.add(newId);
 			synopsis.put(newId, newEle);
-			outputQueue.add(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp));
+			output(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp));
 		}
 		relatedMap.put(id, newIds);
 	}
 	
 	@Override
-	protected void processMinus(MarkedElement markedElement){
+	protected void processMinus(MarkedElement markedElement) throws SystemErrorException{
 		Long id = markedElement.id;
 		Set<Long> eleIdsToDelete = relatedMap.get(id);
 		relatedMap.remove(id);
@@ -60,7 +61,7 @@ public class ExpandOperator extends OperatorOneInOneOut{
 			eleIdToDelete = it.next();
 			eleToDelete = synopsis.get(eleIdToDelete);
 			synopsis.remove(eleIdToDelete);
-			outputQueue.add(new MarkedElement(eleToDelete, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp));
+			output(new MarkedElement(eleToDelete, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp));
 		}
 	}
 

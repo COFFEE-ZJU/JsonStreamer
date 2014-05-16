@@ -4,8 +4,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import cn.edu.zju.jsonStreamer.constants.Constants;
 import cn.edu.zju.jsonStreamer.constants.Constants.ElementMark;
 import cn.edu.zju.jsonStreamer.constants.Constants.JsonValueType;
+import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
 import cn.edu.zju.jsonStreamer.json.Element;
 import cn.edu.zju.jsonStreamer.json.MarkedElement;
 import cn.edu.zju.jsonStreamer.jsonAPI.JsonQueryTree;
@@ -29,6 +31,8 @@ public class AggregationOperator extends OperatorOneInOneOut{
 		super(tree);
 		groupMap = new HashMap<Integer, JsonArray>();
 		projDealer = ProjectionDealer.genProjectionDealer(tree.projection);
+//		if(Constants.DEBUG)
+//			System.out.println("AggOp: "+this.hashCode()+"proj: \n"+Constants.gson.toJson(tree.projection));
 		groupAttrDealer = ExpressionDealer.genExpressionDealer(tree.groupby_attribute_name);
 		synopsis = new HashMap<Long, Element>();
 		relatedMap = new HashMap<Integer, Long>();
@@ -36,7 +40,7 @@ public class AggregationOperator extends OperatorOneInOneOut{
 	}
 	
 	@Override
-	protected void processPlus(MarkedElement markedElement){
+	protected void processPlus(MarkedElement markedElement) throws SystemErrorException{
 		Long id = markedElement.id;
 		Element ele = markedElement.element;
 		Element groupByEle = groupAttrDealer.deal(ele);
@@ -53,12 +57,14 @@ public class AggregationOperator extends OperatorOneInOneOut{
 			long eleIdToDelete = relatedMap.get(groupByKey);
 			Element eleToDelete = synopsis.get(eleIdToDelete);
 			synopsis.remove(eleIdToDelete);
-			outputQueue.add(new MarkedElement(eleToDelete, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp));
+			output(new MarkedElement(eleToDelete, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp));
 		}
 		Element arrayToDeal = new Element(groupMap.get(groupByKey), JsonValueType.ARRAY);
 		Element newEle = projDealer.deal(arrayToDeal, groupByEle);
 		long newId = ElementIdGenerator.getNewId();
-		outputQueue.add(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp));
+		output(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp));
+//		if(Constants.DEBUG)
+//			System.out.println("AggOp"+this.hashCode()+": "+Constants.gson.toJson(newEle.jsonElement)+inputQueue.hashCode());
 		
 		synopsis.put(newId, newEle);
 		relatedMap.put(groupByKey, newId);
@@ -66,7 +72,7 @@ public class AggregationOperator extends OperatorOneInOneOut{
 	}
 	
 	@Override
-	protected void processMinus(MarkedElement markedElement){
+	protected void processMinus(MarkedElement markedElement) throws SystemErrorException{
 		Long id = markedElement.id;
 		Element ele = markedElement.element;
 		Element groupByEle = groupAttrDealer.deal(ele);
@@ -77,14 +83,14 @@ public class AggregationOperator extends OperatorOneInOneOut{
 		long eleIdToDelete = relatedMap.get(groupByKey);
 		Element eleToDelete = synopsis.get(eleIdToDelete);
 		synopsis.remove(eleIdToDelete);
-		outputQueue.add(new MarkedElement(eleToDelete, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp));
+		output(new MarkedElement(eleToDelete, eleIdToDelete, ElementMark.MINUS, markedElement.timeStamp));
 		
 		if(newA.size() != 0){
 			groupMap.put(groupByKey, removeElementInJsonArray(array, ele.jsonElement));
 			Element arrayToDeal = new Element(groupMap.get(groupByKey), JsonValueType.ARRAY);
 			Element newEle = projDealer.deal(arrayToDeal, groupByEle);
 			long newId = ElementIdGenerator.getNewId();
-			outputQueue.add(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp));
+			output(new MarkedElement(newEle, newId, ElementMark.PLUS, markedElement.timeStamp));
 			synopsis.put(newId, newEle);
 			relatedMap.put(groupByKey, newId);
 		}

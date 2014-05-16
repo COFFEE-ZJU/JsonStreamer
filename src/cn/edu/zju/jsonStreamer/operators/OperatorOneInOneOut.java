@@ -1,5 +1,6 @@
 package cn.edu.zju.jsonStreamer.operators;
 
+import java.util.Iterator;
 import java.util.Queue;
 
 import cn.edu.zju.jsonStreamer.constants.Constants.ElementMark;
@@ -13,18 +14,17 @@ public abstract class OperatorOneInOneOut extends Operator{
 		super(tree);
 	}
 	protected Queue<MarkedElement> inputQueue = null;
-	protected Queue<MarkedElement> outputQueue = null;
+//	protected Queue<MarkedElement> outputQueue = null;
 	
 	protected abstract void processMinus(MarkedElement markedElement) throws SystemErrorException;
 	protected abstract void processPlus(MarkedElement markedElement) throws SystemErrorException;
 	
 	@Override
 	public final void execute() throws SystemErrorException {
-		if(inputQueue == null || outputQueue == null){
-			if(inputQueueList.size() != 1 || outputQueueList.size() != 1)
-				throw new SystemErrorException("queue size abnormal");
+		if(inputQueue == null){
+			if(inputQueueList.size() != 1)
+				throw new SystemErrorException("input queue size abnormal");
 			inputQueue = inputQueueList.get(0);
-			outputQueue = outputQueueList.get(0);
 		}
 		MarkedElement me;
 		while(! inputQueue.isEmpty()){

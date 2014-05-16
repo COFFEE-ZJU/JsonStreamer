@@ -8,6 +8,7 @@ import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
 import cn.edu.zju.jsonStreamer.jsonAPI.JsonQueryTree;
 import cn.edu.zju.jsonStreamer.utils.ElementIdGenerator;
 import cn.edu.zju.jsonStreamer.utils.TimeStampGenerator;
+import cn.edu.zju.jsonStreamer.wrapper.WrapperManager;
 
 public class StreamSender extends cn.edu.zju.jsonStreamer.operators.Operator{
 	private boolean isMaster = false;	//TODO
@@ -17,7 +18,7 @@ public class StreamSender extends cn.edu.zju.jsonStreamer.operators.Operator{
 	
 	public StreamSender(JsonQueryTree tree, long queueId) throws SystemErrorException {
 		super(tree);
-		inputStream = IOManager.getInstance().getInputStreamByName(tree.stream_source);
+		inputStream = WrapperManager.getStreamInputByWrapper(tree.stream_source);
 		inputStream.execute();
 		isMaster = tree.is_master;
 		queueName = Constants.stormJedisSendQueue+queueId;

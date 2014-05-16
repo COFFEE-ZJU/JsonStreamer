@@ -56,7 +56,7 @@ public class RangeWindowOperator extends OperatorStreamToRelation{
 	}
 
 	@Override
-	protected void process(MarkedElement markedElement) {
+	protected void process(MarkedElement markedElement) throws SystemErrorException {
 		if(timeRange != -1){
 			long cutTime = markedElement.timeStamp - timeRange;
 			MarkedElement me;
@@ -64,14 +64,15 @@ public class RangeWindowOperator extends OperatorStreamToRelation{
 				me = synopsis.peek();
 				if(me.timeStamp <= cutTime){
 					synopsis.poll();
-					outputQueue.add(new MarkedElement(me.element, me.id, ElementMark.MINUS, markedElement.timeStamp));
+					output(new MarkedElement(me.element, me.id, ElementMark.MINUS, markedElement.timeStamp));
 				}
 				else break;
 			}
 		}
 		
 		synopsis.add(markedElement);
-		outputQueue.add(markedElement);
+		output(markedElement);
+//		if(Constants.DEBUG) System.out.println("rangeWin"+hashCode()+": ");
 	}
 
 }

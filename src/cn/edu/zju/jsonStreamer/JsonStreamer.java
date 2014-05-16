@@ -81,6 +81,9 @@ public class JsonStreamer extends StoppableThread{
 				JsonStreamer.getInstance().stopTheThread();
 				break;
 			}
+			else if(cmd.equals("OPS")){
+				Scheduler.getInstance().printOps();
+			}
 		}
 //		new SchemaServer().start();
 //		String API1 = QueryParser.parseToAPIByFile("query_1");
