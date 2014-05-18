@@ -1,0 +1,16 @@
+USER:user
+PW:123123
+QUERY_START
+
+
+QUERY:stream1 = readFromWrapper ("range_win_wrapper1", false) ;
+QUERY:stream2 = readFromWrapper ("range_win_wrapper2", true) ;
+QUERY:range1 = stream1 -> window[rows 1];
+QUERY:range2 = stream2 -> window[rows 1];
+QUERY:j = join r1 in range1, 
+QUERY:	   r2 in range2 
+QUERY:     where r1.x == r2.x
+QUERY:	   into {r1.x,r1.y,r2.z,t1:r1.t,t2:r2.t};
+QUERY: j->istream;
+
+QUERY_END

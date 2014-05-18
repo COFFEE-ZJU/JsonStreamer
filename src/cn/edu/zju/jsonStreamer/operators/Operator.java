@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import cn.edu.zju.jsonStreamer.constants.Constants;
 import cn.edu.zju.jsonStreamer.constants.Constants.OperatorState;
 import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
 import cn.edu.zju.jsonStreamer.json.JsonSchema;
@@ -32,6 +33,7 @@ public abstract class Operator {
 		if(outputQueueList.isEmpty()) throw new SystemErrorException("empty output list");
 		for(Queue<MarkedElement> queue: outputQueueList){
 			queue.add(me);
+			if(Constants.DEBUG) System.out.println(this.getClass().getSimpleName()+": "+me);
 		}
 	}
 	

@@ -1,0 +1,15 @@
+{
+	"id": "range_win_schema1",
+	"type":"object",
+	"properties": {
+		"x":{
+			"type": "integer"
+		},
+		"y":{
+			"type": "integer"
+		},
+		"t":{
+			"type": "integer"
+		}
+	}
+}

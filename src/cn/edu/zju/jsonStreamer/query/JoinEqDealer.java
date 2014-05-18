@@ -8,12 +8,12 @@ public class JoinEqDealer {
 	
 	public JoinEqDealer(JsonExpression left, JsonExpression right){
 		leftDealer = ExpressionDealer.genExpressionDealer(left);
-		leftDealer = ExpressionDealer.genExpressionDealer(right);
+		rightDealer = ExpressionDealer.genExpressionDealer(right);
 	}
 	
 	public boolean deal(Element leftEle, Element rightEle){
-		Element left = leftDealer.deal(leftEle);
-		Element right = rightDealer.deal(rightEle);
+		Element left = leftDealer.deal(leftEle, null);
+		Element right = rightDealer.deal(null, rightEle);
 		
 		return left.equals(right);
 	}

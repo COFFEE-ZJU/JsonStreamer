@@ -33,10 +33,14 @@ public abstract class OperatorStreamToRelation extends Operator{
 	protected abstract void process(MarkedElement markedElement) throws SystemErrorException;
 	
 	protected void flushElements() throws SystemErrorException{
-		Iterator<MarkedElement> it = synopsis.iterator();
-		while(bufferedNum > 0){
-			output(it.next());
-			bufferedNum --;
+		if(bufferedNum > 0){
+			MarkedElement[] list = new MarkedElement[0];
+			list = synopsis.toArray(list);
+			int len = list.length;
+			while(bufferedNum > 0){
+				output(list[len-bufferedNum]);
+				bufferedNum -- ;
+			}
 		}
 	}
 	
@@ -47,18 +51,21 @@ public abstract class OperatorStreamToRelation extends Operator{
 			inputQueue = inputQueueList.get(0);
 //			outputQueue = outputQueueList.get(0);
 		}
+		boolean needFlush = register.needFlush();
+		if(needFlush) flushElements();
+		
 		MarkedElement me;
 		while(! inputQueue.isEmpty()){
 			me = inputQueue.poll();
 			if(me.mark == ElementMark.MINUS)
 				throw new SystemErrorException("stream element can't be MINUS marked");
-			else process(me);
+			else{
+				process(me);
+				if(needFlush) flushElements();
+			}
 		}
 		
-		if(register.needFlush()){
-			flushElements();
-			register.windowDoneFlush(opNum);
-		}
+		if(needFlush) register.windowDoneFlush(opNum);
 	}
 
 }

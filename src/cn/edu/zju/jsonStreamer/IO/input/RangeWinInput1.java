@@ -7,19 +7,14 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import cn.edu.zju.jsonStreamer.IO.input.TestStreamInput.ExecThread;
-import cn.edu.zju.jsonStreamer.constants.Constants;
 import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
-import cn.edu.zju.jsonStreamer.utils.RandomJsonGenerator;
 
-import com.google.gson.JsonElement;
-
-public class FileStreamInput implements JStreamInput{
+public class RangeWinInput1 implements JStreamInput{
 	private boolean started = false;
 	private File file;
 	private Queue<String> queue;
-	public FileStreamInput(String filePath){
-		file = new File(filePath);
+	public RangeWinInput1(){
+		file = new File("inputFiles/rangeWinInput1.txt");
 		queue = new LinkedList<String>();
 	}
 	
@@ -41,16 +36,21 @@ public class FileStreamInput implements JStreamInput{
 	}
 	
 	class ExecThread extends Thread{
+		private int[] sleeps = new int[]{1,2,1,1};
+		private int cnt = 0;
 		@Override
 		public void run(){
 			try {
 				BufferedReader br = new BufferedReader(new FileReader(file));
 				String json;
 				while((json = br.readLine()) != null){
-					queue.add(json);
-					try {
-						Thread.sleep(RandomJsonGenerator.random.nextInt(1000));
-					} catch (InterruptedException e) {}
+					if(cnt<sleeps.length){
+						try {
+							Thread.sleep(sleeps[cnt]*1000);
+						} catch (InterruptedException e) {}
+						queue.add(json);
+						cnt++;
+					}
 				}
 			} catch (IOException e) {
 				e.printStackTrace();

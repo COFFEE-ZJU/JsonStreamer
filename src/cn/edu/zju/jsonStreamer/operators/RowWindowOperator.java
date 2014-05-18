@@ -24,8 +24,6 @@ public class RowWindowOperator extends OperatorStreamToRelation{
 		}
 		synopsis.add(markedElement);
 		bufferedNum ++;
-		output(markedElement);
-		
 	}
 
 }

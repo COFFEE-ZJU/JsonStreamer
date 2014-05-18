@@ -38,6 +38,7 @@ public class StormGrouper extends BaseBasicBolt{
     public void prepare(Map stormConf, TopologyContext context) {
 		gson = new Gson();
 		synopsis = new HashMap<Long, Element>();
+		keyExpr.attribute_source = null;
 		groupKeyDealer = ExpressionDealer.genExpressionDealer(keyExpr);
 	}
 

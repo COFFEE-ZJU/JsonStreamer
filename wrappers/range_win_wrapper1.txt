@@ -1,0 +1,4 @@
+{
+	"implement_class": "RangeWinInput1",
+	"schema_name": "range_win_schema1"
+}

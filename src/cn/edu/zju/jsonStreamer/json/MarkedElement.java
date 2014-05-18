@@ -2,6 +2,7 @@ package cn.edu.zju.jsonStreamer.json;
 
 import java.io.Serializable;
 
+import cn.edu.zju.jsonStreamer.constants.Constants;
 import cn.edu.zju.jsonStreamer.constants.Constants.ElementMark;
 
 public class MarkedElement implements Serializable{
@@ -14,5 +15,10 @@ public class MarkedElement implements Serializable{
 		this.id = id;
 		this.mark = mark;
 		this.timeStamp = timeStamp;
+	}
+	
+	@Override
+	public String toString(){
+		return Constants.gson.toJson(this);
 	}
 }

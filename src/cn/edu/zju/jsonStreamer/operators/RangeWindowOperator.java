@@ -79,7 +79,6 @@ public class RangeWindowOperator extends OperatorStreamToRelation{
 		
 		synopsis.add(markedElement);
 		bufferedNum ++;
-		output(markedElement);
 //		if(Constants.DEBUG) System.out.println("rangeWin"+hashCode()+": ");
 	}
 
