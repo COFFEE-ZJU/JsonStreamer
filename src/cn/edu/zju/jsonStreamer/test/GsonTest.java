@@ -2,7 +2,10 @@ package cn.edu.zju.jsonStreamer.test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -118,8 +121,18 @@ public class GsonTest {
 		System.out.println(ele1.hashCode() + ",  " + ele2.hashCode());
 	}
 	
+	public void test4(){
+		Queue<Integer> queue = new LinkedList<Integer>();
+		queue.add(1);
+		queue.add(2);
+		queue.add(3);
+		queue.add(4);
+		Iterator<Integer> it = queue.iterator();
+		while(it.hasNext()) System.out.println(it.next());
+	}
+	
 	public static void main(String[] args) {
 		
-		new GsonTest().test3();
+		new GsonTest().test4();
 	}
 }

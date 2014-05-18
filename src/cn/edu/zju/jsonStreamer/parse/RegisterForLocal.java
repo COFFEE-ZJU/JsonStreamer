@@ -36,6 +36,9 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 public class RegisterForLocal extends Register{
+	private boolean needFlush = false;
+	private boolean[] windowFlushed;
+	private int windowOpNum = 0;
 	private JStreamOutput outStream;
 	private List<Operator> opList = null;
 	private List<Operator> tmpOps = null;
@@ -44,6 +47,25 @@ public class RegisterForLocal extends Register{
 	public RegisterForLocal(){
 		opList = new LinkedList<Operator>();
 		opMap = new HashMap<JsonQueryTree, Operator>();
+	}
+	
+	public void windowDoneFlush(int opNum){
+		windowFlushed[opNum] = true;
+		boolean checkAll = true;
+		for(int i=0; i<windowOpNum; i++){
+			checkAll = checkAll && windowFlushed[i];
+			if(! checkAll) return ;
+		}
+		needFlush = false;
+	}
+	
+	public boolean needFlush(){
+		return needFlush;
+	}
+	
+	public void notifyFlush(){
+		needFlush = true;
+		for(int i=0; i<windowOpNum; i++) windowFlushed[i] = false;
 	}
 	
 	@Override
@@ -65,6 +87,8 @@ public class RegisterForLocal extends Register{
 			curTree = it.next();
 			parse(curTree);
 		}
+		
+		windowFlushed = new boolean[windowOpNum];
 		Scheduler.getInstance().addOperators(tmpOps);
 		opList.addAll(tmpOps);
 	}
@@ -86,15 +110,17 @@ public class RegisterForLocal extends Register{
 			connectOperators(retOp, subOp);
 			break;
 		case LEAF:
-			retOp = new LeafOperator(tree);
+			retOp = new LeafOperator(tree, this);
 			break;
 		case ROWWINDOW:
-			retOp = new RowWindowOperator(tree);
+			retOp = new RowWindowOperator(tree, this, windowOpNum);
+			windowOpNum ++;
 			subOp = parse(tree.input);
 			connectOperators(retOp, subOp);
 			break;
 		case RANGEWINDOW:
-			retOp = new RangeWindowOperator(tree);
+			retOp = new RangeWindowOperator(tree, this, windowOpNum);
+			windowOpNum ++;
 			subOp = parse(tree.input);
 			connectOperators(retOp, subOp);
 			break;

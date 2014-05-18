@@ -6,11 +6,12 @@ import cn.edu.zju.jsonStreamer.constants.Constants.WindowUnit;
 import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
 import cn.edu.zju.jsonStreamer.json.MarkedElement;
 import cn.edu.zju.jsonStreamer.jsonAPI.JsonQueryTree;
+import cn.edu.zju.jsonStreamer.parse.RegisterForLocal;
 
 public class RangeWindowOperator extends OperatorStreamToRelation{
 	private final long timeRange;		//time unit: millisecond  0 for now; -1 for unbounded
-	public RangeWindowOperator(JsonQueryTree tree) throws SystemErrorException{
-		super(tree);
+	public RangeWindowOperator(JsonQueryTree tree, RegisterForLocal register, int opNum) throws SystemErrorException{
+		super(tree, register, opNum);
 		String time = (String)tree.windowsize;
 		String[] times = time.split(" ");
 		if(times.length == 1){
@@ -63,14 +64,21 @@ public class RangeWindowOperator extends OperatorStreamToRelation{
 			while(! synopsis.isEmpty()){
 				me = synopsis.peek();
 				if(me.timeStamp <= cutTime){
-					synopsis.poll();
-					output(new MarkedElement(me.element, me.id, ElementMark.MINUS, markedElement.timeStamp));
+					if(bufferedNum == synopsis.size()){
+						synopsis.poll();
+						bufferedNum --;
+					}
+					else{
+						synopsis.poll();
+						output(new MarkedElement(me.element, me.id, ElementMark.MINUS, markedElement.timeStamp));
+					}
 				}
 				else break;
 			}
 		}
 		
 		synopsis.add(markedElement);
+		bufferedNum ++;
 		output(markedElement);
 //		if(Constants.DEBUG) System.out.println("rangeWin"+hashCode()+": ");
 	}

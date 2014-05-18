@@ -1,0 +1,11 @@
+USER:user
+PW:123123
+QUERY_START
+
+
+QUERY:streamT = readFromWrapper ("employee_wrapper", true) ;
+
+QUERY:tmpv = streamT -> window[range now];
+QUERY:tmpv  ->  dstream;
+
+QUERY_END

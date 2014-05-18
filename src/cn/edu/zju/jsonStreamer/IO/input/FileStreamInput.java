@@ -7,12 +7,15 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import cn.edu.zju.jsonStreamer.IO.input.TestStreamInput.ExecThread;
 import cn.edu.zju.jsonStreamer.constants.Constants;
 import cn.edu.zju.jsonStreamer.constants.SystemErrorException;
+import cn.edu.zju.jsonStreamer.utils.RandomJsonGenerator;
 
 import com.google.gson.JsonElement;
 
 public class FileStreamInput implements JStreamInput{
+	private boolean started = false;
 	private File file;
 	private Queue<String> queue;
 	public FileStreamInput(String filePath){
@@ -39,14 +42,25 @@ public class FileStreamInput implements JStreamInput{
 
 	@Override
 	public void execute() {
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(file));
-			String json;
-			while((json = br.readLine()) != null){
-				queue.add(json);
+		if(! started) new ExecThread().start();
+		started = true;
+	}
+	
+	class ExecThread extends Thread{
+		@Override
+		public void run(){
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(file));
+				String json;
+				while((json = br.readLine()) != null){
+					queue.add(json);
+					try {
+						Thread.sleep(RandomJsonGenerator.random.nextInt(1000));
+					} catch (InterruptedException e) {}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 

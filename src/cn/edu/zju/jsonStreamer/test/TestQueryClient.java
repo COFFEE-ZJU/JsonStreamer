@@ -69,7 +69,7 @@ public class TestQueryClient extends StoppableThread{
 	}
 
 	public static void main(String[] args) throws IOException {
-		TestQueryClient tqc = new TestQueryClient("employee_query_2");
+		TestQueryClient tqc = new TestQueryClient("employee_query_3");
 		tqc.start();
 		Scanner scanner = new Scanner(System.in);
 		String cmd;

@@ -36,6 +36,7 @@ public class TestStreamInput implements JStreamInput{
 	@Override
 	public void execute(){
 		if(! started) new ExecThread().start();
+		started = true;
 	}
 	
 	class ExecThread extends Thread{
